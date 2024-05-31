@@ -1,0 +1,52 @@
+version: '3.9'
+services:
+  # Service
+  service_name:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app
+    env_file:
+      - ./dev.env
+    restart: 'always'
+    depends_on:
+      - nats
+      - db
+      - redis
+  integration_tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./:/app
+    command: ['make', 'int']
+    env_file:
+      - ./dev.env
+    depends_on:
+      - service_name
+  # Infrastructure
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: service_name
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+    ports:
+      - 5432:5432
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+  nats:
+    image: nats:alpine
+    restart: always
+    command:
+      - '--jetstream'
+    ports:
+      - 4222:4222
