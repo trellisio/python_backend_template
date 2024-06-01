@@ -10,8 +10,6 @@ services:
       - 8000:8000
     volumes:
       - ./:/app
-    env_file:
-      - ./dev.env
     restart: 'always'
     depends_on:
       - nats
@@ -24,8 +22,6 @@ services:
       target: test
     volumes:
       - ./:/app
-    env_file:
-      - ./dev.env
     environment:
       - LOG_LEVEL=ERROR
     depends_on:

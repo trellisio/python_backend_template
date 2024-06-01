@@ -19,6 +19,8 @@ scan:
 	bandit -r . -lll # Show 3 lines of context
 	safety check
 
+commit-ready: lint format
+
 # Docker
 up:
 	docker-compose -f ./docker-compose.yml build
