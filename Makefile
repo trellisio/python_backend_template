@@ -42,4 +42,4 @@ int:
 	./wait-for.sh http://service_name:8000/healthz pytest -vv tests/integration --capture=tee-sys --asyncio-mode=auto
 
 # Git Hooks
-pre-commit: check scan unit
+pre-commit: check scan unit # execute in .git/hooks
