@@ -12,7 +12,7 @@ class ConnectionsConfig(BaseSettings):
     REDIS_HOST: str = Field(description="Redis host URL", default="redis")
     REDIS_PORT: int = Field(description="Redis host port", default=6379)
     REDIS_PASSWORD: str = Field(description="Redis password", default="password")
-    
+
     # Nats
     NATS_URL: str = Field(description="NATS connection URL", default="nats://nats:4222")
 
