@@ -2,7 +2,8 @@ from sys import stderr
 from typing import Literal
 
 from loguru import logger
-from pydantic_settings import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 type LogLevel = Literal["NOTSET", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
 

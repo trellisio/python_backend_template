@@ -1,5 +1,8 @@
-from pydantic_settings import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 from redis.asyncio import Redis
+
+from .logger import logger
 
 
 class ConnectionsConfig(BaseSettings):
@@ -24,7 +27,9 @@ class Connections:
             protocol=3,
             db=0,
         )
+        logger.info("Connections created ⚡️")
 
     @classmethod
     async def close_connections(cls):
         await cls.rc.close()
+        logger.info("Connections closed ⚡️")

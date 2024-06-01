@@ -5,7 +5,7 @@ from .cache import Cache, CacheValue
 
 class InMemoryCache(Cache):
     store: dict[str, Any]
-    
+
     def __init__(self):
         self.store = {}
 
