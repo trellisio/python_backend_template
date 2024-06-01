@@ -17,6 +17,8 @@ check:
 
 scan:
 	bandit -r . -lll # Show 3 lines of context
+
+safety:
 	safety check
 
 commit-ready: lint format
