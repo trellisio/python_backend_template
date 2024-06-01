@@ -18,7 +18,7 @@ class Cache(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def multi_set(self, values: Mapping[str, CacheValue]) -> list[bool]:
+    async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
         raise NotImplementedError()
 
     @abstractmethod
@@ -26,5 +26,5 @@ class Cache(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def multi_delete(self, keys: list[str]) -> list[bool]:
+    async def multi_delete(self, keys: list[str]) -> bool:
         raise NotImplementedError()

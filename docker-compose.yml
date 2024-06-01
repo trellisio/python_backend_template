@@ -21,12 +21,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: dev
+      target: test
     volumes:
       - ./:/app
-    command: ['make', 'int']
     env_file:
       - ./dev.env
+    environment:
+      - LOG_LEVEL=ERROR
     depends_on:
       - service_name
   # Infrastructure

@@ -17,4 +17,5 @@ class LoggingConfig(BaseSettings):
 
 config = LoggingConfig()
 
+logger.remove()
 logger.add(stderr, format="{time} {level} {message}", level=config.LOG_LEVEL)

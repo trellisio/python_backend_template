@@ -19,19 +19,17 @@ class InMemoryCache(Cache):
         self.store[key] = value
         return True
 
-    async def multi_set(self, values: Mapping[str, CacheValue]) -> list[bool]:
-        res = []
-        for key, value in values:
+    async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
+        for key, value in values.items():
             self.store[key] = value
-            res.append(True)
-        return res
+        return True
 
     async def delete(self, key: str) -> bool:
         return await self.multi_delete([key])
 
-    async def multi_delete(self, keys: list[str]) -> list[bool]:
-        res = []
+    async def multi_delete(self, keys: list[str]) -> bool:
         for key in keys:
-            result = self.store.pop(key, False)
-            res.append(False if result is False else True)
-        return res
+            result =  self.store.pop(key, False)
+            if result is False:
+                return False
+        return True

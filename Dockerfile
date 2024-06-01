@@ -42,6 +42,18 @@ RUN --mount=type=cache,target=/root/.cache \
     poetry install --without dev,test,docs
 
 #################################################
+# Testing
+#################################################
+FROM builder as test
+WORKDIR $PYSETUP_PATH
+# Install dev dependencies
+RUN --mount=type=cache,target=/root/.cache \
+    poetry install --with dev,test
+WORKDIR /app
+EXPOSE 8000
+CMD make int
+
+#################################################
 # Development
 #################################################
 FROM base as dev
@@ -52,10 +64,11 @@ COPY --from=builder $POETRY_HOME $POETRY_HOME
 COPY --from=builder $PYSETUP_PATH $PYSETUP_PATH
 # Install dev dependencies
 RUN --mount=type=cache,target=/root/.cache \
-    poetry install --with dev,test
+    poetry install --with dev
 WORKDIR /app
 EXPOSE 8000
-CMD ["uvivorn", "--reload", "app.entrypoints.server.fastapi:app"]
+CMD uvicorn app.entrypoints.server.fastapi:app --port 8000 --proxy-headers --host 0.0.0.0 --reload
+
 
 #################################################
 # Production
@@ -65,4 +78,4 @@ ENV FASTAPI_ENV=production
 COPY --from=builder $PYSETUP_PATH $PYSETUP_PATH
 WORKDIR /app
 COPY ./app /app/
-CMD ["uvicorn", "app.entrypoints.server.fastapi:app"]
+CMD uvicorn app.entrypoints.server.fastapi:app --port 8000 --proxy-headers --host 0.0.0.0

@@ -14,22 +14,24 @@ class ConnectionsConfig(BaseSettings):
 
 config = ConnectionsConfig()
 
-
 class Connections:
     rc: Redis
 
     @classmethod
     async def create_connections(cls):
-        cls.rc = await Redis(
+        cls.rc = Redis(
             host=config.REDIS_HOST,
             port=config.REDIS_PORT,
             password=config.REDIS_PASSWORD,
             protocol=3,
             db=0,
+            decode_responses=True
         )
+        await cls.rc.ping()
+        logger.info("Redis connected 🚨")
         logger.info("Connections created ⚡️")
 
     @classmethod
     async def close_connections(cls):
-        await cls.rc.close()
+        await cls.rc.aclose()
         logger.info("Connections closed ⚡️")
