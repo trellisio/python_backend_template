@@ -55,7 +55,7 @@ RUN --mount=type=cache,target=/root/.cache \
     poetry install --with dev,test
 WORKDIR /app
 EXPOSE 8000
-CMD ["uvivorn", "--reload", "main:app"]
+CMD ["uvivorn", "--reload", "app:app"]
 
 #################################################
 # Production
@@ -65,4 +65,4 @@ ENV FASTAPI_ENV=production
 COPY --from=builder $PYSETUP_PATH $PYSETUP_PATH
 WORKDIR /app
 COPY ./app /app/
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app"]
+CMD ["uvicorn", "app:app"]
