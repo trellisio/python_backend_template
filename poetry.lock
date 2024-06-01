@@ -388,19 +388,6 @@ dnspython = ">=2.0.0"
 idna = ">=2.0.0"
 
 [[package]]
-name = "eventemitter"
-version = "0.2.0"
-description = "Tools for working with async events."
-optional = false
-python-versions = "*"
-files = [
-    {file = "eventemitter-0.2.0.tar.gz", hash = "sha256:0147a0d6fc8b03641997b337b8c755e89608bd0784335a4fec50bde1e31f8d6f"},
-]
-
-[package.extras]
-testing = ["pep257", "pep8", "pyenchant", "pyflakes", "pylint", "pytest", "pytest-cov"]
-
-[[package]]
 name = "fastapi"
 version = "0.111.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -2145,4 +2132,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "d3afb08fa91c47b038de23fd5d4fcf3c832fedaf5027fa10248b50bbf839e839"
+content-hash = "b697e823870b9adfd481c6d597a231c81c79176d5070037839c39e280f78cfca"

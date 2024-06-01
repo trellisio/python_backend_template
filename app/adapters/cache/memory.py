@@ -29,7 +29,7 @@ class InMemoryCache(Cache):
 
     async def multi_delete(self, keys: list[str]) -> bool:
         for key in keys:
-            result =  self.store.pop(key, False)
+            result = self.store.pop(key, False)
             if result is False:
                 return False
         return True

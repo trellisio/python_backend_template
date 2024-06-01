@@ -14,6 +14,7 @@ class ConnectionsConfig(BaseSettings):
 
 config = ConnectionsConfig()
 
+
 class Connections:
     rc: Redis
 
@@ -25,7 +26,7 @@ class Connections:
             password=config.REDIS_PASSWORD,
             protocol=3,
             db=0,
-            decode_responses=True
+            decode_responses=True,
         )
         await cls.rc.ping()
         logger.info("Redis connected 🚨")

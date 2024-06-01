@@ -1,16 +1,15 @@
 import pytest
 
-from app.adapters.cache.memory import InMemoryCache
 from app.adapters.cache.redis import RedisCache
 from app.connections import Connections
 
 
-class TestInMemoryCache:
-    cache: InMemoryCache
+class TestRedisCache:
+    cache: RedisCache
 
     @pytest.fixture(autouse=True)
-    def set_up(self):
-        self.cache = InMemoryCache()
+    def set_up(self, connections: Connections):
+        self.cache = RedisCache(connections.rc)
 
     @pytest.mark.asyncio
     async def test_can_set_value(self):
@@ -62,11 +61,3 @@ class TestInMemoryCache:
         assert res is None
         res = await self.cache.get("company")
         assert res is None
-
-
-class TestRedisCache(TestInMemoryCache):
-    cache: RedisCache
-
-    @pytest.fixture(autouse=True)
-    def set_up(self, connections: Connections):
-        self.cache = RedisCache(connections.rc)

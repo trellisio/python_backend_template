@@ -11,11 +11,9 @@ class NatsEventPublisher(Publisher):
     def __init__(self, nc: Client):
         self.nc = nc
 
-    async def publish(
-        self, channel: str, payload: Payload
-    ):
+    async def publish(self, channel: str, payload: Payload):
         # if payload is dict, turn to string and decode
         if isinstance(payload, dict):
-            payload = json.dumps(payload) # turn to string
-        
+            payload = json.dumps(payload)  # turn to string
+
         await self.nc.publish(channel, payload.encode())

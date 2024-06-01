@@ -15,7 +15,7 @@ class RedisCache(Cache):
         return await self.rc.get(key)
 
     async def multi_get(self, keys: list[str]) -> list[str | None]:
-        return await self.rc.mget(keys).decode('utf-8')
+        return await self.rc.mget(keys).decode("utf-8")
 
     async def set(self, key: str, value: CacheValue) -> bool:
         ok = await self.rc.set(key, value)
