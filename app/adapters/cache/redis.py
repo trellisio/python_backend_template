@@ -5,7 +5,7 @@ from redis.asyncio import Redis
 from .cache import Cache, CacheValue
 
 
-class Redis(Cache):
+class RedisCache(Cache):
     rc: Redis
 
     def __init__(self, rc: Redis):

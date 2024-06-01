@@ -5,11 +5,14 @@ from .cache import Cache, CacheValue
 
 class InMemoryCache(Cache):
     store: dict[str, Any]
+    
+    def __init__(self):
+        self.store = {}
 
-    async def get(self, key: str) -> str:
+    async def get(self, key: str) -> str | None:
         return self.store.get(key, None)
 
-    async def multi_get(self, keys: list[str]) -> list[str]:
+    async def multi_get(self, keys: list[str]) -> list[str | None]:
         return [self.store.get(key, None) for key in keys]
 
     async def set(self, key: str, value: CacheValue) -> bool:
