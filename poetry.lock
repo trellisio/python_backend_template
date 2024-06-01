@@ -388,6 +388,19 @@ dnspython = ">=2.0.0"
 idna = ">=2.0.0"
 
 [[package]]
+name = "eventemitter"
+version = "0.2.0"
+description = "Tools for working with async events."
+optional = false
+python-versions = "*"
+files = [
+    {file = "eventemitter-0.2.0.tar.gz", hash = "sha256:0147a0d6fc8b03641997b337b8c755e89608bd0784335a4fec50bde1e31f8d6f"},
+]
+
+[package.extras]
+testing = ["pep257", "pep8", "pyenchant", "pyflakes", "pylint", "pytest", "pytest-cov"]
+
+[[package]]
 name = "fastapi"
 version = "0.111.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -921,6 +934,21 @@ files = [
 mergedeep = ">=1.3.4"
 platformdirs = ">=2.2.0"
 pyyaml = ">=5.1"
+
+[[package]]
+name = "nats-py"
+version = "2.7.2"
+description = "NATS client for Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "nats-py-2.7.2.tar.gz", hash = "sha256:0c97b4a57bed0ef1ff9ae6c19bc115ec7ca8ede5ab3e001fd00a377056a547cf"},
+]
+
+[package.extras]
+aiohttp = ["aiohttp"]
+fast-parse = ["fast-mail-parser"]
+nkeys = ["nkeys"]
 
 [[package]]
 name = "orjson"
@@ -2117,4 +2145,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "a331aadf83a60f55c1d5d67a3178ca975da018ac21958333c8a7e918a159d209"
+content-hash = "d3afb08fa91c47b038de23fd5d4fcf3c832fedaf5027fa10248b50bbf839e839"
