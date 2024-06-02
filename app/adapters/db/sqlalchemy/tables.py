@@ -2,9 +2,9 @@ from sqlalchemy import Column, Integer, MetaData, String, Table
 
 metadata = MetaData()
 
-board = Table(
-    "board",
+user = Table(
+    "user",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("name", String, nullable=False, unique=True),
+    Column("email", String, nullable=False, unique=True),
 )

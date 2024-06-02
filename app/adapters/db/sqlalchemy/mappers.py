@@ -2,8 +2,8 @@ from sqlalchemy.orm import registry
 
 from app import models
 
-from .tables import board
+from .tables import user
 
 mapper_registry = registry()
 
-example_mapper = mapper_registry.map_imperatively(models.Board, board)
+user_mapper = mapper_registry.map_imperatively(models.User, user)

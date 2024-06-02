@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.connections import Connections
 
 from ..uow import Uow
-from .repositories import SqlAlchemyBoardRepository
+from .repositories import SqlAlchemyUserRepository
 
 
 def session_factory_builder(engine: AsyncEngine, **kwargs):
@@ -18,7 +18,7 @@ def session_factory_builder(engine: AsyncEngine, **kwargs):
 
 class SqlAlchemyUow(Uow):
     session: AsyncSession
-    exampleRepository: SqlAlchemyBoardRepository
+    userRepository: SqlAlchemyUserRepository
 
     def __init__(self, **kwargs):
         self.session_factory = session_factory_builder(Connections.db.engine, **kwargs)
@@ -27,7 +27,7 @@ class SqlAlchemyUow(Uow):
         async with self.session_factory() as session:
             async with session.begin():
                 self.session = session
-                self.exampleRepository = SqlAlchemyBoardRepository(session)
+                self.userRepository = SqlAlchemyUserRepository(session)
 
     async def commit(self):
         await self.session.commit()

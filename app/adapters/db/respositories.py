@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 
-from app.models import Board
+from app.models import User
 
 
-class BoardRepository(ABC):
+class UserRepository(ABC):
     @abstractmethod
-    async def add(self, board: Board) -> None:
+    async def add(self, user: User) -> None:
         raise NotImplementedError()
 
     @abstractmethod
-    async def find(self, name: str) -> Board:
+    async def find(self, name: str) -> User:
         raise NotImplementedError()
 
     @abstractmethod
@@ -17,5 +17,5 @@ class BoardRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def list(self) -> list[Board]:
+    async def list(self) -> list[User]:
         raise NotImplementedError

@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from .respositories import BoardRepository
+from .respositories import UserRepository
 
 
 class Uow(ABC):
-    boardRepository: BoardRepository
+    userRepository: UserRepository
 
     @abstractmethod
     async def __aenter__(self):
