@@ -9,7 +9,7 @@ from .publisher.nats import NatsEventPublisher
 class Adapters:
     cache: Cache
     publisher: Publisher
-    
+
     def __init__(self):
         self.cache = RedisCache(Connections.rc)
         self.publisher = NatsEventPublisher(Connections.nc)

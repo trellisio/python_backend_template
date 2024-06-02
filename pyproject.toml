@@ -15,6 +15,7 @@ redis = {extras = ["hiredis"], version = "^5.0.4"}
 pydantic-settings = "^2.2.1"
 uvicorn = "^0.30.0"
 nats-py = "^2.7.2"
+sqlalchemy = "^2.0.30"
 
 
 [tool.poetry.group.dev.dependencies]
