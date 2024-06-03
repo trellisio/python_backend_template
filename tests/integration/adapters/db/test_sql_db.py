@@ -1,27 +1,18 @@
 import pytest
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from app import models
 from app.adapters.db.sqlalchemy import SqlAlchemyUow
-from app.adapters.db.sqlalchemy.tables import metadata
-
-DB_URL = "sqlite+aiosqlite:///:memory:"
+from app.connections import Connections
 
 
-class TestInMemoryDb:
-    engine: AsyncEngine = create_async_engine(DB_URL, future=True)
+class TestSqlDb:
     uow: SqlAlchemyUow
-
+    
     @pytest.fixture(autouse=True)
-    async def set_up(self):
-        # create database tables
-        async with self.engine.begin() as conn:
-            await conn.run_sync(metadata.drop_all)
-            await conn.run_sync(metadata.create_all)
-
-        self.uow = SqlAlchemyUow(self.engine, isolation_level=None)
+    async def set_up(self, connections: Connections):
+        self.uow = SqlAlchemyUow(connections.pc)
         await self._seed_model()
-
+    
     async def test_can_insert_model(self):
         await self._seed_model('another_email@gmail.com')
 

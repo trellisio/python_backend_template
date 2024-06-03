@@ -14,7 +14,6 @@ class TestRedisCache:
     async def test_can_set_value(self):
         res = await self.cache.set("service", "service_name")
         assert res is True
-        # assert self.cache.store.get("service", None) == "service_name"
 
     async def test_can_set_values(self):
         res = await self.cache.multi_set(

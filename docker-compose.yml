@@ -13,7 +13,7 @@ services:
     restart: 'always'
     depends_on:
       - nats
-      - db
+      - postgres
       - redis
   integration_tests:
     build:

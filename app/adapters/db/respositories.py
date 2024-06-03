@@ -9,11 +9,11 @@ class UserRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def find(self, name: str) -> User:
+    async def find(self, email: str) -> User:
         raise NotImplementedError()
 
     @abstractmethod
-    async def remove(self) -> None:
+    async def remove(self, email: str) -> None:
         raise NotImplementedError()
 
     @abstractmethod
