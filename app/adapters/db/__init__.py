@@ -1,3 +1,3 @@
 from .uow import Uow
 
-__all__ = ['Uow']
+__all__ = ["Uow"]

@@ -16,9 +16,10 @@ def session_factory_builder(engine: AsyncEngine, **kwargs):
         **kwargs,
     )
 
+
 class SqlAlchemyUow(Uow):
     session: AsyncSession
-    userRepository: SqlAlchemyUserRepository
+    user_repository: SqlAlchemyUserRepository
 
     def __init__(self, **kwargs):
         self.session_factory = session_factory_builder(Connections.db.engine, **kwargs)
@@ -27,7 +28,7 @@ class SqlAlchemyUow(Uow):
         async with self.session_factory() as session:
             async with session.begin():
                 self.session = session
-                self.userRepository = SqlAlchemyUserRepository(session)
+                self.user_repository = SqlAlchemyUserRepository(session)
 
     async def commit(self):
         await self.session.commit()
@@ -38,7 +39,3 @@ class SqlAlchemyUow(Uow):
 
     async def close(self):
         await self.session.close()
-
-    async def execute(self, query: str):
-        records = await self.session.execute(query)
-        return records.scalars().all()

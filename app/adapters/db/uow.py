@@ -4,7 +4,7 @@ from .respositories import UserRepository
 
 
 class Uow(ABC):
-    userRepository: UserRepository
+    user_repository: UserRepository
 
     @abstractmethod
     async def __aenter__(self):
@@ -26,7 +26,3 @@ class Uow(ABC):
     async def close(self):
         raise NotImplementedError()
 
-    # Views
-    @abstractmethod
-    async def execute(self, query: str):
-        raise NotImplementedError()
