@@ -36,7 +36,7 @@ integration: down up
 
 # Testing
 unit:
-	set -a; . ./dev.env; pytest -vv tests/unit/
+	pytest -vv tests/unit/ --capture=tee-sys --asyncio-mode=auto
 
 int:
 	./wait-for.sh http://service_name:8000/healthz pytest -vv tests/integration --capture=tee-sys --asyncio-mode=auto

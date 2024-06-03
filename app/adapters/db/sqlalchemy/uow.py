@@ -1,28 +1,39 @@
+from typing import Any, Optional
+
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-
-from app.connections import Connections
 
 from ..uow import Uow
 from .repositories import SqlAlchemyUserRepository
 
 
-def session_factory_builder(engine: AsyncEngine, **kwargs):
+def session_factory_builder(engine: AsyncEngine, **kwargs: Any):
     return sessionmaker(
         engine,
         class_=AsyncSession,
         expire_on_commit=False,
-        isolation_level="REPEATABLE READ",
         **kwargs,
     )
 
 
 class SqlAlchemyUow(Uow):
-    session: AsyncSession
+    # repositories
     user_repository: SqlAlchemyUserRepository
 
-    def __init__(self, **kwargs):
-        self.session_factory = session_factory_builder(Connections.db.engine, **kwargs)
+    # session
+    session_factory: Any
+    session: AsyncSession
+
+    def __init__(
+        self,
+        engine: AsyncEngine,
+        isolation_level: str | None = "REPEATABLE READ",
+        **kwargs: Any,
+    ):
+        if isolation_level is not None:
+            kwargs["isolation_level"] = isolation_level  # only add if set
+
+        self.session_factory = session_factory_builder(engine, **kwargs)
 
     async def __aenter__(self):
         async with self.session_factory() as session:

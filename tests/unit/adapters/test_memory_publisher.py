@@ -10,7 +10,6 @@ class TestInMemoryPublisher:
     def set_up(self):
         self.publisher = InMemoryEventPublisher()
 
-    @pytest.mark.asyncio
     async def test_can_publish_string_event(self):
         await self.publisher.publish("event", "test")
 
@@ -20,7 +19,6 @@ class TestInMemoryPublisher:
             "payload": "test",
         }
 
-    @pytest.mark.asyncio
     async def test_can_publish_dict_event(self):
         payload = {"subject": "event", "field": "bar"}
         await self.publisher.publish("event", payload)

@@ -3,6 +3,7 @@ from nats.aio.client import Client
 from pydantic import Field
 from pydantic_settings import BaseSettings
 from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from .logger import logger
 
@@ -16,6 +17,12 @@ class ConnectionsConfig(BaseSettings):
     # Nats
     NATS_URL: str = Field(description="NATS connection URL", default="nats://nats:4222")
 
+    # Postgres
+    POSTGRES_URL: str = Field(
+        description="URL to connect to Postgres",
+        default="postgresql+asyncpg://user:password@postgres:5432/service_name",
+    )
+
 
 config = ConnectionsConfig()
 
@@ -23,6 +30,7 @@ config = ConnectionsConfig()
 class Connections:
     rc: Redis
     nc: Client
+    pc: AsyncEngine
 
     @classmethod
     async def create_connections(cls):
@@ -38,10 +46,13 @@ class Connections:
         logger.info("Redis connected 🚨")
         cls.nc = await connect(config.NATS_URL)
         logger.info("NATS connected 🚨")
+        cls.pc = create_async_engine(config.POSTGRES_URL, future=True)
+        logger.info("Postgres connected 🚨")
         logger.info("Connections created ⚡️")
 
     @classmethod
     async def close_connections(cls):
         await cls.rc.aclose()
         await cls.nc.close()
+        await cls.pc.dispose()
         logger.info("Connections closed ⚡️")

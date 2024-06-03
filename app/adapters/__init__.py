@@ -16,4 +16,4 @@ class Adapters:
     def __init__(self):
         self.cache = RedisCache(Connections.rc)
         self.publisher = NatsEventPublisher(Connections.nc)
-        self.uoq = SqlAlchemyUow()
+        self.uoq = SqlAlchemyUow(Connections.pc)

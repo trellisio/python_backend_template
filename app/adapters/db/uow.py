@@ -25,4 +25,3 @@ class Uow(ABC):
     @abstractmethod
     async def close(self):
         raise NotImplementedError()
-
