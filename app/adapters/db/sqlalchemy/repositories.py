@@ -23,7 +23,9 @@ class SqlAlchemyUserRepository(UserRepository):
         return res.scalars().first()
 
     async def remove(self, email: str) -> None:
-        await self.session.execute(delete(models.User).where(models.User.email == email))
+        await self.session.execute(
+            delete(models.User).where(models.User.email == email)
+        )
 
     async def list(self) -> list[models.User]:
         res = await self.session.execute(select(models.User))
