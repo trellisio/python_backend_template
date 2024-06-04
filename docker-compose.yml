@@ -1,31 +1,31 @@
 version: '3.9'
 services:
   # Service
-  service_name:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: dev
-    ports:
-      - 8000:8000
-    volumes:
-      - ./:/app
-    restart: 'always'
-    depends_on:
-      - nats
-      - postgres
-      - redis
-  integration_tests:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: test
-    volumes:
-      - ./:/app
-    environment:
-      - LOG_LEVEL=ERROR
-    depends_on:
-      - service_name
+  # service_name:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: dev
+  #   ports:
+  #     - 8000:8000
+  #   volumes:
+  #     - ./:/app
+  #   restart: 'always'
+  #   depends_on:
+  #     - nats
+  #     - postgres
+  #     - redis
+  # integration_tests:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: test
+  #   volumes:
+  #     - ./:/app
+  #   environment:
+  #     - LOG_LEVEL=ERROR
+  #   depends_on:
+  #     - service_name
   # Infrastructure
   postgres:
     image: postgres:latest
