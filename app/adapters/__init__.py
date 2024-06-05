@@ -1,10 +1,8 @@
-from kink import di
-
 from app.config import config
 
-from .connection import Connection
+from .connection import *
 
-# register adapters for DI
+# Inject specific adapters based on ENVIRONMENT
 match config.ENVIRONMENT:
     case "local":
         from .cache.memory import *
@@ -14,18 +12,3 @@ match config.ENVIRONMENT:
         from .cache.redis import *
         from .db.sqlalchemy import *
         from .publisher.nats import *
-
-# establish connections
-
-class Connections:
-    @classmethod
-    async def create_connections(cls):
-        connections: list[Connection] = di[Connection]
-        for connection in connections:
-            await connection.connect()
-    
-    @classmethod
-    async def cloud_connections(cls):
-        connections: list[Connection] = di[Connection]
-        for connection in connections:
-            await connection.close()

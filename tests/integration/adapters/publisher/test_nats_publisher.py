@@ -1,15 +1,16 @@
 import pytest
 
-from app.adapters import Connections
-from app.adapters.publisher.nats import NatsEventPublisher
+from app.adapters.publisher.nats import NatsConnection, NatsEventPublisher
 
 
 class TestNatsPublisher:
     publisher: NatsEventPublisher
 
     @pytest.fixture(autouse=True)
-    def set_up(self, connections: Connections):
-        self.publisher = NatsEventPublisher(connections.nc)
+    async def set_up(self):
+        connection = NatsConnection()
+        await connection.connect()
+        self.publisher = NatsEventPublisher(connection.nc)
 
     async def test_can_publish_string_event(self):
         await self.publisher.publish("event", "test")

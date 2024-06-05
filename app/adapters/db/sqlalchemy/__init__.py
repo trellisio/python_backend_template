@@ -2,6 +2,7 @@ from sqlalchemy.orm import registry
 
 from app import models
 
+from .connections.postgres import PostgresSqlAlchemyConnection
 from .tables import user
 from .uow import SqlAlchemyUow
 
@@ -9,4 +10,4 @@ from .uow import SqlAlchemyUow
 mapper_registry = registry()
 user_mapper = mapper_registry.map_imperatively(models.User, user)
 
-__all__ = ["SqlAlchemyUow"]
+__all__ = ["SqlAlchemyUow", "PostgresSqlAlchemyConnection"]

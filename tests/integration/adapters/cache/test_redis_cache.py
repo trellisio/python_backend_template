@@ -1,15 +1,19 @@
 import pytest
 
-from app.adapters import Connections
-from app.adapters.cache.redis import RedisCache
+from app.adapters.cache.redis import RedisCache, RedisConnection
 
 
 class TestRedisCache:
     cache: RedisCache
 
     @pytest.fixture(autouse=True)
-    def set_up(self, connections: Connections):
-        self.cache = RedisCache(connections.rc)
+    async def set_up(self):
+        connection = RedisConnection()
+        await connection.connect()
+
+        self.cache = RedisCache(connection.rc)
+
+        await connection.close()
 
     async def test_can_set_value(self):
         res = await self.cache.set("service", "service_name")

@@ -20,7 +20,7 @@ class RedisConnectionConfig(BaseSettings):
 @inject(alias=Connection)
 class RedisConnection(Connection):
     rc: Redis
-    
+
     async def connect(self):
         config = RedisConnectionConfig()
         rc = Redis(
@@ -31,15 +31,15 @@ class RedisConnection(Connection):
             db=0,
             decode_responses=True,
         )
-        
+
         self.rc = rc
         di[Redis] = rc
-        
+
         await rc.ping()
-        
+
         logger.info("Redis connected 🚨")
-    
-    async def close(self):
+
+    async def close(self, cleanup: bool = False):
         await self.rc.aclose()
 
 

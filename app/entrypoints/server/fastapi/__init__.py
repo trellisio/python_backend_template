@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from kink import di
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -23,7 +24,8 @@ config = FastApiConfig()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await Connections.create_connections()
+    connections: Connections = di[Connections]
+    await connections.create_connections()
     # add routes to server
     app.include_router(router, prefix=config.URL_PREFIX)
     logger.info("Server started 🚀")
@@ -31,7 +33,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # cleanup on shutdown
-    await Connections.close_connections()
+    await connections.close_connections()
 
 
 app = FastAPI(lifespan=lifespan)

@@ -19,17 +19,17 @@ class NatsConnectionConfig(BaseSettings):
 @inject(alias=Connection)
 class NatsConnection(Connection):
     nc: Client
-    
+
     async def connect(self):
         config = NatsConnectionConfig()
         nc = await connect(config.NATS_URL)
-        
+
         self.nc = nc
         di[Client] = nc
-        
+
         logger.info("Nats connected 🚨")
-    
-    async def close(self):
+
+    async def close(self, cleanup: bool = False):
         await self.nc.close()
 
 
