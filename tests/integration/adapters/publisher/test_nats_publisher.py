@@ -1,7 +1,7 @@
 import pytest
 
+from app.adapters import Connections
 from app.adapters.publisher.nats import NatsEventPublisher
-from app.connections import Connections
 
 
 class TestNatsPublisher:

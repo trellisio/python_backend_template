@@ -1,3 +1,4 @@
+from kink import inject
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -7,6 +8,7 @@ from app import models
 from ..respositories import UserRepository
 
 
+@inject(alias=UserRepository)
 class SqlAlchemyUserRepository(UserRepository):
     session: AsyncSession
 

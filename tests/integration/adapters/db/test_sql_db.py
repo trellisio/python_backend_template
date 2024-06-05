@@ -1,8 +1,8 @@
 import pytest
 
 from app import models
+from app.adapters import Connections
 from app.adapters.db.sqlalchemy import SqlAlchemyUow
-from app.connections import Connections
 
 
 class TestSqlDb:

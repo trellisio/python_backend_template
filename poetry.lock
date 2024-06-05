@@ -872,6 +872,20 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "kink"
+version = "0.8.0"
+description = "Dependency injection for python."
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "kink-0.8.0-py3-none-any.whl", hash = "sha256:c0b959cd291e057a72c501ffc77498416ef5afd5f30476a7d5e6fc3be09001a5"},
+    {file = "kink-0.8.0.tar.gz", hash = "sha256:5aa6dcb4c0abde9ed15c4f73e52f163802c91fd7d804b3e1e4e8e78b9cef48f2"},
+]
+
+[package.dependencies]
+typing_extensions = ">=4.9.0,<5.0.0"
+
+[[package]]
 name = "loguru"
 version = "0.7.2"
 description = "Python logging made (stupidly) simple"
@@ -2400,4 +2414,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "aaafdce41e520b2839ee2500d9b22f6651fc6f524839bf8b21e42fa99e9df2f4"
+content-hash = "b7914a254ef356c74c087738ef495844f5c54d354fdba00e2686bc3efc951bbb"

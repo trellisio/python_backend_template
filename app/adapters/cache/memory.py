@@ -1,8 +1,11 @@
 from typing import Any, Mapping
 
+from kink import inject
+
 from .cache import Cache, CacheValue
 
 
+@inject(alias=Cache)
 class InMemoryCache(Cache):
     store: dict[str, Any]
 

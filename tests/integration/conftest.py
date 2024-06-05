@@ -1,10 +1,10 @@
 import pytest
 
-from app.connections import Connections
+from app.adapters import Connections
 
 
 @pytest.fixture()
 async def connections():
     await Connections.create_connections()
     yield Connections
-    await Connections.close_connections()
+    await Connections.close_connections(destroy=True)

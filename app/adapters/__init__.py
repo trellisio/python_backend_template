@@ -1,19 +1,31 @@
-from app.connections import Connections
+from kink import di
 
-from .cache import Cache
-from .cache.redis import RedisCache
-from .db import Uow
-from .db.sqlalchemy import SqlAlchemyUow
-from .publisher import Publisher
-from .publisher.nats import NatsEventPublisher
+from app.config import config
 
+from .connection import Connection
 
-class Adapters:
-    cache: Cache
-    publisher: Publisher
-    uow: Uow
+# register adapters for DI
+match config.ENVIRONMENT:
+    case "local":
+        from .cache.memory import *
+        from .db.sqlalchemy import *
+        from .publisher.memory import *
+    case _:
+        from .cache.redis import *
+        from .db.sqlalchemy import *
+        from .publisher.nats import *
 
-    def __init__(self):
-        self.cache = RedisCache(Connections.rc)
-        self.publisher = NatsEventPublisher(Connections.nc)
-        self.uoq = SqlAlchemyUow(Connections.pc)
+# establish connections
+
+class Connections:
+    @classmethod
+    async def create_connections(cls):
+        connections: list[Connection] = di[Connection]
+        for connection in connections:
+            await connection.connect()
+    
+    @classmethod
+    async def cloud_connections(cls):
+        connections: list[Connection] = di[Connection]
+        for connection in connections:
+            await connection.close()

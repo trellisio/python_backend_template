@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
-from app.connections import Connections
+from app.adapters import Connections
 from app.logger import logger
 
 from .routers import router

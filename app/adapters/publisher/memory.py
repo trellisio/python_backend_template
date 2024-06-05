@@ -1,8 +1,11 @@
 from typing import Mapping
 
+from kink import inject
+
 from .publisher import Payload, Publisher
 
 
+@inject(alias=Publisher)
 class InMemoryEventPublisher(Publisher):
     published_messages: list[Mapping[str, Payload]]
 
