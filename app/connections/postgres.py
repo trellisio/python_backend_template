@@ -1,11 +1,12 @@
-from kink import di, inject
+from kink import inject
 from pydantic import Field
 from pydantic_settings import BaseSettings
 from sqlalchemy.engine.interfaces import IsolationLevel
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from app.adapters.connection import Connection
 from app.logger import logger
+
+from .connection import Connection
 
 
 class PostgresConnectionConfig(BaseSettings):
@@ -22,7 +23,7 @@ class PostgresConnectionConfig(BaseSettings):
 
 
 @inject(alias=Connection)
-class PostgresSqlAlchemyConnection(Connection):
+class PostgresConnection(Connection):
     pc: AsyncEngine
 
     async def connect(self):
@@ -31,7 +32,6 @@ class PostgresSqlAlchemyConnection(Connection):
         pc.execution_options(isolation_level=config.POSTGRES_ISOLATION_LEVEL)
 
         self.pc = pc
-        di[AsyncEngine] = pc
 
         # Apply migrations on connection
         # def run_upgrade( connection, cfg):
