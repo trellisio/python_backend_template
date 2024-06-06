@@ -1,7 +1,7 @@
 from kink import inject
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.connections.postgres import PostgresConnection
+from app.connections.sql import SqlConnection
 
 from ..uow import Uow
 from .repositories import SqlAlchemyUserRepository
@@ -16,8 +16,8 @@ class SqlAlchemyUow(Uow):
     session_factory: async_sessionmaker[AsyncSession]
     session: AsyncSession
 
-    def __init__(self, connection: PostgresConnection):
-        engine = connection.pc
+    def __init__(self, connection: SqlConnection):
+        engine = connection.engine
         self.session_factory = async_sessionmaker(
             engine,
             expire_on_commit=False,

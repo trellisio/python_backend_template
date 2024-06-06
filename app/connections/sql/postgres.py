@@ -1,12 +1,14 @@
 from kink import inject
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from sqlalchemy import MetaData
 from sqlalchemy.engine.interfaces import IsolationLevel
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from app.logger import logger
 
-from .connection import Connection
+from ..connection import Connection
+from .sql import SqlConnection
 
 
 class PostgresConnectionConfig(BaseSettings):
@@ -14,7 +16,7 @@ class PostgresConnectionConfig(BaseSettings):
         description="URL to connect to Postgres",
         default="postgresql+asyncpg://user:password@postgres:5432/service_name",
     )
-    POSTGRES_ISOLATION_LEVEL: IsolationLevel = Field(
+    DB_ISOLATION_LEVEL: IsolationLevel = Field(
         description="DB transaction isolation level", default="REPEATABLE READ"
     )
     DB_ECHO: bool = Field(
@@ -23,15 +25,20 @@ class PostgresConnectionConfig(BaseSettings):
 
 
 @inject(alias=Connection)
-class PostgresConnection(Connection):
-    pc: AsyncEngine
+class PostgresConnection(SqlConnection):
+    engine: AsyncEngine
+    metadata: MetaData
+
+    def __init__(self, metadata: MetaData):
+        self.metadata = metadata
 
     async def connect(self):
         config = PostgresConnectionConfig()
-        pc = create_async_engine(config.POSTGRES_URL, future=True, echo=config.DB_ECHO)
-        pc.execution_options(isolation_level=config.POSTGRES_ISOLATION_LEVEL)
-
-        self.pc = pc
+        engine = create_async_engine(
+            config.POSTGRES_URL, future=True, echo=config.DB_ECHO
+        )
+        engine.execution_options(isolation_level=config.DB_ISOLATION_LEVEL)
+        self.engine = engine
 
         # Apply migrations on connection
         # def run_upgrade( connection, cfg):
