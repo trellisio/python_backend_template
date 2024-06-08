@@ -3,9 +3,9 @@ from typing import Mapping
 from kink import inject
 from redis.asyncio import Redis
 
-from app.connections.redis import RedisConnection
+from app.services.interfaces.cache import Cache, CacheValue
 
-from .cache import Cache, CacheValue
+from .connection import RedisConnection
 
 
 @inject(alias=Cache)

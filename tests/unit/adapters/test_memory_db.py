@@ -1,8 +1,7 @@
 import pytest
 
 from app import models
-from app.adapters.db.sqlalchemy import SqlAlchemyUow, metadata
-from app.connections.sql.sqlite import SqliteConnection
+from app.infra.sqlalchemy.uow import SqlAlchemyUow, SqlConnection
 
 
 class TestInMemoryDb:
@@ -11,7 +10,7 @@ class TestInMemoryDb:
     @pytest.fixture(autouse=True)
     async def set_up(self):
         # create database tables
-        connection = SqliteConnection(metadata)
+        connection = SqlConnection()
         await connection.connect()
         self.uow = SqlAlchemyUow(connection)
         await self._seed_model()

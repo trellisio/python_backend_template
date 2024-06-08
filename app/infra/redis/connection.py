@@ -5,7 +5,7 @@ from redis.asyncio import Redis
 
 from app.logger import logger
 
-from .connection import Connection
+from ..connection import Connection
 
 
 class RedisConnectionConfig(BaseSettings):

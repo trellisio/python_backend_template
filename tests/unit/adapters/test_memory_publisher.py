@@ -1,6 +1,6 @@
 import pytest
 
-from app.adapters.publisher.memory import InMemoryEventPublisher
+from app.infra.memory.publisher import InMemoryEventPublisher
 
 
 class TestInMemoryPublisher:

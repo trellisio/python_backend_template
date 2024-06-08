@@ -2,7 +2,7 @@ from typing import Any, Mapping
 
 from kink import inject
 
-from .cache import Cache, CacheValue
+from app.services.interfaces.cache import Cache, CacheValue
 
 
 @inject(alias=Cache)

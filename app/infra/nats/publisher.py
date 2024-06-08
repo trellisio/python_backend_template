@@ -3,9 +3,9 @@ import json
 from kink import inject
 from nats.aio.client import Client
 
-from app.connections.nats import NatsConnection
+from app.services.interfaces.publisher import Payload, Publisher
 
-from .publisher import Payload, Publisher
+from .connection import NatsConnection
 
 
 @inject(alias=Publisher)

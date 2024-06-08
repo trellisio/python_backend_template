@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings
 
 from app.logger import logger
 
-from .connection import Connection
+from ..connection import Connection
 
 
 class NatsConnectionConfig(BaseSettings):

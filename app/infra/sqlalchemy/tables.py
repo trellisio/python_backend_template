@@ -1,8 +1,9 @@
-from kink import di
 from sqlalchemy import Column, Integer, MetaData, String, Table
+from sqlalchemy.orm import registry
+
+from app import models
 
 metadata = MetaData()
-di[MetaData] = metadata  # register for DI
 
 user = Table(
     "user",
@@ -10,3 +11,7 @@ user = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("email", String, nullable=False, unique=True, index=True),
 )
+
+# register mapping between table and domain models
+mapper_registry = registry()
+user_mapper = mapper_registry.map_imperatively(models.User, user)
