@@ -14,4 +14,11 @@ user = Table(
 
 # register mapping between table and domain models
 mapper_registry = registry()
-user_mapper = mapper_registry.map_imperatively(models.User, user)
+
+
+def add_model_mappings():
+    mapper_registry.map_imperatively(models.User, user)
+
+
+def remove_model_mappings():
+    mapper_registry.dispose()

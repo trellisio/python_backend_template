@@ -11,7 +11,9 @@ from tables import metadata
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", os.environ.get("POSTGRES_URL"))
+config.set_main_option(
+    "sqlalchemy.url", os.environ.get("DB_URL", "sqlite+aiosqlite:///:memory:")
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

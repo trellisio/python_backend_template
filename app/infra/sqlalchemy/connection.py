@@ -1,3 +1,7 @@
+from os import path
+
+from alembic import command
+from alembic.config import Config
 from pydantic import Field
 from pydantic_settings import BaseSettings
 from sqlalchemy.engine.interfaces import IsolationLevel
@@ -6,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from app.logger import logger
 
 from ..connection import Connection
-from .tables import metadata
+from .tables import add_model_mappings, metadata, remove_model_mappings
 
 
 class SqlConnectionConfig(BaseSettings):
@@ -36,16 +40,27 @@ class SqlConnection(Connection):
         self.engine = engine
 
         await self.apply_migrations()
+        add_model_mappings()
 
         logger.info("Database connected 🚨")
 
     async def close(self, cleanup: bool = False):
         if cleanup:
             async with self.engine.begin() as conn:
+                remove_model_mappings()
                 await conn.run_sync(metadata.drop_all)
 
         await self.engine.dispose()
 
     async def apply_migrations(self):
+        # async with self.engine.begin() as conn:
+        #     await conn.run_sync(metadata.create_all)
+        def run_upgrade(connection: AsyncEngine, cfg: Config):
+            cfg.attributes["connection"] = connection
+            command.upgrade(cfg, "head")
+
         async with self.engine.begin() as conn:
-            await conn.run_sync(metadata.create_all)
+            await conn.run_sync(
+                run_upgrade,
+                Config(path.join("app", "infra", "sqlalchemy", "alembic.ini")),
+            )
