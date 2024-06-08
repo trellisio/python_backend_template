@@ -1,15 +1,15 @@
 import pytest
 
 from app import models
-from app.adapters.db.sqlalchemy import SqlAlchemyUow
+from app.infra.sqlalchemy.uow import SqlAlchemyUow, SqlConnection
 
 
 class TestSqlDb:
     uow: SqlAlchemyUow
 
     @pytest.fixture(autouse=True)
-    async def set_up(self, connections: Connections):
-        self.uow = SqlAlchemyUow(connections.pc)
+    async def set_up(self):
+        self.uow = SqlAlchemyUow(SqlConnection())
         await self._seed_model()
 
     async def test_can_insert_model(self):

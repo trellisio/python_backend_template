@@ -1,6 +1,6 @@
 import pytest
 
-from app.adapters.publisher.nats import NatsConnection, NatsEventPublisher
+from app.infra.nats.publisher import NatsConnection, NatsEventPublisher
 
 
 class TestNatsPublisher:

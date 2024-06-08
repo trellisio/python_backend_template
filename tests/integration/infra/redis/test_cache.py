@@ -1,6 +1,6 @@
 import pytest
 
-from app.adapters.cache.redis import RedisCache, RedisConnection
+from app.infra.redis import RedisCache, RedisConnection
 
 
 class TestRedisCache:

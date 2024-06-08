@@ -1,12 +1,10 @@
 import pytest
-from kink import di
 
-from app.adapters import Connections
+from app.infra import close_connections, init_connections
 
 
 @pytest.fixture()
 async def connections():
-    connections: Connections = di[Connections]
-    await connections.create_connections()
-    yield connections
-    await connections.close_connections(destroy=True)
+    await init_connections()
+    yield
+    await close_connections(destroy=True)
