@@ -1,10 +1,9 @@
 from kink import di
 
-from app.connections import Connection
-
 from .config import config
+from .connections import Connection
 
-# Adapters
+# Initialize Infra
 match config.ENVIRONMENT:
     case "local":
         from app.adapters.cache.memory import *
@@ -14,13 +13,14 @@ match config.ENVIRONMENT:
         from app.adapters.cache.redis import *
         from app.adapters.db.sqlalchemy import *
         from app.adapters.publisher.nats import *
-        
-# Connections    
+
+# Connections
 match config.ENVIRONMENT:
     case "local":
         from app.connections.sql.sqlite import *
     case _:
         from app.connections.sql.postgres import *
+
 
 async def init_connections():
     connections: list[Connection] = di[Connection]

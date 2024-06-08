@@ -1,3 +1,5 @@
+from alembic import command
+from alembic.config import Config
 from kink import inject
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -40,15 +42,19 @@ class PostgresConnection(SqlConnection):
         engine.execution_options(isolation_level=config.DB_ISOLATION_LEVEL)
         self.engine = engine
 
-        # Apply migrations on connection
-        # def run_upgrade( connection, cfg):
-        #     cfg.attributes["connection"] = connection
-        #     command.upgrade(cfg, "head")
-
-        # async with pc.begin() as conn:
-        #     await conn.run_sync(run_upgrade, Config("alembic.ini"))
-
         logger.info("Postgres connected 🚨")
 
     async def close(self, cleanup: bool = False):
-        await self.pc.dispose()
+        if cleanup:
+            async with self.engine.begin() as conn:
+                await conn.run_sync(self.metadata.drop_all)
+                
+        await self.engine.dispose()
+    
+    async def apply_migrations(self):
+        def run_upgrade(connection: AsyncEngine, cfg: Config):
+            cfg.attributes["connection"] = connection
+            command.upgrade(cfg, "head")
+
+        async with self.engine.begin() as conn:
+            await conn.run_sync(run_upgrade, Config("alembic.ini"))

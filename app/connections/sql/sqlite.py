@@ -39,8 +39,18 @@ class SqliteConnection(SqlConnection):
         )
         engine.execution_options(isolation_level=config.DB_ISOLATION_LEVEL)
         self.engine = engine
+        
+        await self.apply_migrations()
 
-        logger.info("Postgres connected 🚨")
+        logger.info("Sqlite connected 🚨")
 
     async def close(self, cleanup: bool = False):
-        await self.engine.dispose()
+        if cleanup:
+            async with self.engine.begin() as conn:
+                await conn.run_sync(self.metadata.drop_all)
+
+            await self.engine.dispose()
+
+    async def apply_migrations(self):
+        async with self.engine.begin() as conn:
+            await conn.run_sync(self.metadata.create_all)

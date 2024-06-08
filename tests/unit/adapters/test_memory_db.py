@@ -13,18 +13,12 @@ class TestInMemoryDb:
         # create database tables
         connection = SqliteConnection(metadata)
         await connection.connect()
-        
-        engine = connection.engine
-        async with engine.begin() as conn:
-            await conn.run_sync(metadata.drop_all)
-            await conn.run_sync(metadata.create_all)
-
         self.uow = SqlAlchemyUow(connection)
         await self._seed_model()
-        
+
         yield
-        
-        await connection.close()
+
+        await connection.close(cleanup=True)
 
     async def test_can_insert_model(self):
         await self._seed_model("another_email@gmail.com")
