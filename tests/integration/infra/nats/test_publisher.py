@@ -10,7 +10,7 @@ class TestNatsPublisher:
     async def set_up(self):
         connection = NatsConnection()
         await connection.connect()
-        self.publisher = NatsEventPublisher(connection.nc)
+        self.publisher = NatsEventPublisher(connection)
 
     async def test_can_publish_string_event(self):
         await self.publisher.publish("event", "test")

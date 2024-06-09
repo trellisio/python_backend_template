@@ -9,8 +9,14 @@ class TestSqlDb:
 
     @pytest.fixture(autouse=True)
     async def set_up(self):
-        self.uow = SqlAlchemyUow(SqlConnection())
+        connection = SqlConnection()
+        await connection.connect()
+        self.uow = SqlAlchemyUow(connection)
         await self._seed_model()
+        
+        yield
+        
+        await connection.close(cleanup=True)
 
     async def test_can_insert_model(self):
         await self._seed_model("another_email@gmail.com")

@@ -12,6 +12,7 @@ services:
       - ./:/app
     environment:
       - ENVIRONMENT=test
+      - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
     restart: 'always'
     depends_on:
       - nats
@@ -27,6 +28,7 @@ services:
     environment:
       - LOG_LEVEL=ERROR
       - ENVIRONMENT=test
+      - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
     depends_on:
       - service_name
   # Infrastructure

@@ -1,4 +1,4 @@
-from kink import di
+from kink import di, inject
 
 from app.config import config
 
@@ -16,13 +16,23 @@ match config.ENVIRONMENT:
         from .sqlalchemy.uow import *
 
 
-async def init_connections():
-    connections: list[Connection] = di[Connection]
-    for connection in connections:
-        await connection.connect()
+@inject()
+class InfraInitializer:
+    connections: list[Connection]
+
+    def __init__(self, connections: list[Connection]):
+        self.connections = connections
+
+    async def init_connections(self):
+        for connection in self.connections:
+            await connection.connect()
 
 
-async def close_connections(cleanup: bool = False):
-    connections: list[Connection] = di[Connection]
-    for connection in connections:
-        await connection.close(cleanup)
+    async def close_connections(self, cleanup: bool = False):
+        for connection in self.connections:
+            await connection.close(cleanup)
+
+infra_initializer = di[InfraInitializer]
+
+init_connections = lambda: infra_initializer.init_connections()
+close_connections = lambda: infra_initializer.close_connections()

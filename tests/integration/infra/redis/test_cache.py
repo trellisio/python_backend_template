@@ -1,6 +1,6 @@
 import pytest
 
-from app.infra.redis import RedisCache, RedisConnection
+from app.infra.redis.cache import RedisCache, RedisConnection
 
 
 class TestRedisCache:
@@ -11,7 +11,7 @@ class TestRedisCache:
         connection = RedisConnection()
         await connection.connect()
 
-        self.cache = RedisCache(connection.rc)
+        self.cache = RedisCache(connection)
 
         await connection.close()
 

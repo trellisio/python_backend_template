@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
-from app.bootstrap import close_connections, init_connections
+from app.infra import close_connections, init_connections
 from app.logger import logger
 
 from .routers import router

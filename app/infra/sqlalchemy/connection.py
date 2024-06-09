@@ -2,6 +2,7 @@ from os import path
 
 from alembic import command
 from alembic.config import Config
+from kink import inject
 from pydantic import Field
 from pydantic_settings import BaseSettings
 from sqlalchemy.engine.interfaces import IsolationLevel
@@ -30,6 +31,7 @@ class SqlConnectionConfig(BaseSettings):
     )
 
 
+@inject(alias=Connection)
 class SqlConnection(Connection):
     engine: AsyncEngine
 
@@ -48,7 +50,9 @@ class SqlConnection(Connection):
         if cleanup:
             async with self.engine.begin() as conn:
                 remove_model_mappings()
-                await conn.run_sync(metadata.drop_all)
+                for table in metadata.sorted_tables:
+                    await conn.execute(table.delete())
+                    await conn.commit()
 
         await self.engine.dispose()
 
