@@ -13,9 +13,9 @@ class TestSqlDb:
         await connection.connect()
         self.uow = SqlAlchemyUow(connection)
         await self._seed_model()
-        
+
         yield
-        
+
         await connection.close(cleanup=True)
 
     async def test_can_insert_model(self):

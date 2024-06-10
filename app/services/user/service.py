@@ -9,10 +9,10 @@ from .dtos import CreateUser
 @inject()
 class UserService:
     uow: Uow
-    
+
     def __init__(self, uow: Uow):
         self.uow = uow
-    
+
     async def create_user(self, create_user: CreateUser):
         async with self.uow:
             user = User(email=create_user.email)

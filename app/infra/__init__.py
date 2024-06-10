@@ -27,10 +27,10 @@ class InfraInitializer:
         for connection in self.connections:
             await connection.connect()
 
-
     async def close_connections(self, cleanup: bool = False):
         for connection in self.connections:
             await connection.close(cleanup)
+
 
 infra_initializer = di[InfraInitializer]
 
