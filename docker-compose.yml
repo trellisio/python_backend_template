@@ -29,6 +29,7 @@ services:
       - LOG_LEVEL=ERROR
       - ENVIRONMENT=test
       - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
+      - SERVER_URL=http://service_name_fastapi:8000
     depends_on:
       - service_name_fastapi
   # Infrastructure
