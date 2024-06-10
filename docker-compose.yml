@@ -1,11 +1,11 @@
 version: '3.9'
 services:
   # Service
-  service_name:
+  service_name_fastapi:
     build:
       context: .
       dockerfile: Dockerfile
-      target: dev
+      target: fastapi_dev
     ports:
       - 8000:8000
     volumes:
@@ -30,7 +30,7 @@ services:
       - ENVIRONMENT=test
       - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
     depends_on:
-      - service_name
+      - service_name_fastapi
   # Infrastructure
   postgres:
     image: postgres:latest

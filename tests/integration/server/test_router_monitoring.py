@@ -2,7 +2,7 @@ import requests
 
 
 class TestMonitoringRouter:
-    service_url = "http://service_name:8000"
+    service_url = "http://service_name_fastapi:8000"
 
     def test_healthz(self):
         resp = requests.get(f"{self.service_url}/healthz")

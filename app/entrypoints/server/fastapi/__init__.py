@@ -7,8 +7,6 @@ from pydantic_settings import BaseSettings
 from app.infra import close_connections, init_connections
 from app.logger import logger
 
-from .routers import router
-
 
 class FastApiConfig(BaseSettings):
     FASTAPI_ENV: str = Field(
@@ -24,8 +22,11 @@ config = FastApiConfig()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_connections()
+    
     # add routes to server
+    from .routers import router
     app.include_router(router, prefix=config.URL_PREFIX)
+    
     logger.info("Server started 🚀")
 
     yield

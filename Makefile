@@ -4,6 +4,9 @@ PYFILES=app tests
 shell:
 	poetry shell
 
+install:
+	poetry install --with entrypoint_fastapi,dev,test,docs
+
 # Formatting
 lint:
 	ruff check --fix $(PYFILES)
@@ -39,7 +42,7 @@ unit:
 	pytest -vv tests/unit/ --capture=tee-sys --asyncio-mode=auto
 
 int:
-	./wait-for.sh http://service_name:8000/healthz pytest -vv tests/integration --capture=tee-sys --asyncio-mode=auto
+	./wait-for.sh http://service_name_fastapi:8000/healthz pytest -vv tests/integration --capture=tee-sys --asyncio-mode=auto
 
 # Git Hooks
 pre-commit: check scan unit # execute in .git/hooks

@@ -22,7 +22,7 @@ ENV PYTHONUNBUFFERED=1 \
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 #################################################
-# Build Dependencies + Create Virtual Environment
+# Build Base/Common Dependencies + Create VENV
 #################################################
 FROM base as builder
 RUN apt-get update && \
@@ -39,43 +39,68 @@ WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
 # Install runtime dependencies
 RUN --mount=type=cache,target=/root/.cache \
-    poetry install --without dev,test,docs
+    poetry install
 
 #################################################
-# Testing
+# Build Entrypoint Dependencies
 #################################################
-FROM builder as test
+###################
+# Testing
+##################
+FROM builder as test_builder
 WORKDIR $PYSETUP_PATH
 # Install dev dependencies
 RUN --mount=type=cache,target=/root/.cache \
     poetry install --with dev,test
-WORKDIR /app
-EXPOSE 8000
-CMD make int
+###################
+# FastAPI
+##################
+FROM builder as fastapi_builder
+WORKDIR $PYSETUP_PATH
+# Install dev dependencies
+RUN --mount=type=cache,target=/root/.cache \
+    poetry install --with entrypoint_fastapi
+###################
+# NATS
+##################
 
 #################################################
 # Development
 #################################################
-FROM base as dev
+###################
+# Testing
+##################
+FROM test_builder as test
+WORKDIR /app
+EXPOSE 8000
+CMD make int
+###################
+# FastAPI
+##################
+FROM base as fastapi_dev
 ENV FASTAPI_ENV=development
-WORKDIR $PYSETUP_PATH
-# Copy in poetry + venv
-COPY --from=builder $POETRY_HOME $POETRY_HOME
-COPY --from=builder $PYSETUP_PATH $PYSETUP_PATH
-# Install dev dependencies
-RUN --mount=type=cache,target=/root/.cache \
-    poetry install --with dev
+COPY --from=fastapi_builder $PYSETUP_PATH $PYSETUP_PATH
 WORKDIR /app
 EXPOSE 8000
 CMD uvicorn app.entrypoints.server.fastapi:app --port 8000 --proxy-headers --host 0.0.0.0 --reload
+###################
+# NATS
+##################
 
 
 #################################################
 # Production
 #################################################
-FROM base as prd
+###################
+# FastAPI
+##################
+FROM base as fastapi_prd
 ENV FASTAPI_ENV=production
-COPY --from=builder $PYSETUP_PATH $PYSETUP_PATH
+COPY --from=fastapi_builder $PYSETUP_PATH $PYSETUP_PATH
 WORKDIR /app
+EXPOSE 8000
 COPY ./app /app/
 CMD uvicorn app.entrypoints.server.fastapi:app --port 8000 --proxy-headers --host 0.0.0.0
+###################
+# NATS
+##################
