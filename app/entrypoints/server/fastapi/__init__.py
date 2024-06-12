@@ -8,6 +8,7 @@ from app.infra import close_connections, init_connections
 from app.logger import logger
 
 from .handlers import register_handlers
+from .middlewares import register_middlewares
 
 
 class FastApiConfig(BaseSettings):
@@ -24,8 +25,7 @@ config = FastApiConfig()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_connections()
-    # register error handlers
-    register_handlers(app)
+
     # add routes to server
     from .routers import router
 
@@ -40,3 +40,5 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+register_handlers(app)
+register_middlewares(app)

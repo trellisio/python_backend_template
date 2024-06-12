@@ -1,4 +1,4 @@
-from sys import stderr
+from sys import stderr, stdout
 from typing import Literal
 
 from loguru import logger
@@ -18,4 +18,9 @@ class LoggingConfig(BaseSettings):
 config = LoggingConfig()
 
 logger.remove()
-logger.add(stderr, format="{time} {level} {message}", level=config.LOG_LEVEL)
+logger.add(
+    stderr,
+    colorize=True,
+    format="{time} {level} {message}",
+    level=config.LOG_LEVEL,
+)
