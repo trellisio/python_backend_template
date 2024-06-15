@@ -1,6 +1,6 @@
 import pytest
 
-from app import models
+from app.domain import models
 from app.infra.sqlalchemy.uow import SqlAlchemyUow, SqlConnection
 
 

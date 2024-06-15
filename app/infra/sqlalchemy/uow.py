@@ -3,7 +3,7 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.future import select
 
-from app import models
+from app.domain import models
 from app.services.interfaces.uow import Uow, UserRepository, Views
 
 from .connection import SqlConnection

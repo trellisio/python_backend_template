@@ -1,6 +1,6 @@
 from kink import inject
 
-from app.models import User
+from app.domain.models import User
 
 from ..errors import ResourceExistsException
 from ..interfaces import Uow
