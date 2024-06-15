@@ -16,9 +16,14 @@ class UserRepository(ABC):
     async def remove(self, email: str) -> None:
         raise NotImplementedError()
 
+class Views(ABC):
+    @abstractmethod
+    async def list_users() -> list[User]:
+        raise NotImplementedError()
 
 class Uow(ABC):
     user_repository: UserRepository
+    views: Views
 
     @abstractmethod
     async def __aenter__(self):
