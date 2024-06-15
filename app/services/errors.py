@@ -1,32 +1,37 @@
-from abc import ABC
 from typing import TypedDict
 
 
 class Detail(TypedDict):
-    message: str
+    msg: str
     field: str | None
 
 
-class ServiceException(Exception, ABC):
-    errors: list[Detail] | None
+class ServiceException(Exception):
+    msg: str
+    detail: list[Detail] | None
 
-    def __init__(self, message: str, detail: list[Detail] | None = None):
-        super().__init__(message)
-        self.errors = detail if detail else None
+    def __init__(self, msg: str, detail: list[Detail] | None = None):
+        super().__init__(msg)
+        self.msg = msg
+        self.detail = detail
+
+    def serialize(self):
+        payload = {"msg": self.msg}
+        if self.detail:
+            payload["detail"] = self.detail
+        return payload
 
 
 class NoResourceException(ServiceException):
-    def __init__(self, message: str = "Resource does not exist"):
-        super().__init__(message)
+    def __init__(self, msg: str = "Resource does not exist"):
+        super().__init__(msg)
 
 
 class ResourceExistsException(ServiceException):
-    def __init__(self, message: str = "Resource exists"):
-        super().__init__(message)
+    def __init__(self, msg: str = "Resource exists"):
+        super().__init__(msg)
 
 
 class ValidationError(ServiceException):
-    def __init__(
-        self, detail: list[Detail], message: str = "Invalid parameters passed"
-    ):
-        super().__init__(message, detail)
+    def __init__(self, detail: list[Detail], msg: str = "Invalid parameters passed"):
+        super().__init__(msg, detail)

@@ -19,20 +19,16 @@ class SqlAlchemyUserRepository(UserRepository):
     async def add(self, User: models.User) -> None:
         self.session.add(User)
 
-    async def find(self, email: str) -> models.User:
+    async def find(self, email: str) -> list[models.User]:
         res = await self.session.execute(
-            select(models.User).where(models.User.email == email).limit(1)
+            select(models.User).where(models.User.email == email)
         )
-        return res.scalars().first()
+        return res.scalars().all()
 
     async def remove(self, email: str) -> None:
         await self.session.execute(
             delete(models.User).where(models.User.email == email)
         )
-
-    async def list(self) -> list[models.User]:
-        res = await self.session.execute(select(models.User))
-        return res.scalars().all()
 
 
 @inject(alias=Uow)

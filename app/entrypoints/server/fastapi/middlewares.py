@@ -37,16 +37,16 @@ class AddRequestLogger(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
         except Exception as e:
-            body = await request.body()
             payload = {
-                "body": body.decode("utf-8"),
                 "headers": dict(request.headers),
                 "params": dict(request.query_params),
                 "method": request.method,
                 "url": str(request.url),
                 "error": str(e),
             }
-            logger.opt(ansi=True).error(f"<red>{json.dumps(payload, indent=4)}</red>")
+            logger.opt(ansi=True).error(
+                f"<red>[{request.method}] {request.url} -- \n{json.dumps(payload, indent=4)}</red>"
+            )
             raise e
 
         logger.opt(ansi=True).info(

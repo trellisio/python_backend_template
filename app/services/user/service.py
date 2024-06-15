@@ -2,6 +2,7 @@ from kink import inject
 
 from app.models import User
 
+from ..errors import ResourceExistsException
 from ..interfaces import Uow
 from .dtos import CreateUser
 
@@ -15,6 +16,10 @@ class UserService:
 
     async def create_user(self, create_user: CreateUser):
         async with self.uow:
+            users = await self.uow.user_repository.find(create_user.email)
+            if users:
+                raise ResourceExistsException()
+
             user = User(email=create_user.email)
             await self.uow.user_repository.add(user)
             await self.uow.commit()

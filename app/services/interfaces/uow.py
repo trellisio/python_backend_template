@@ -9,16 +9,12 @@ class UserRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def find(self, email: str) -> User:
+    async def find(self, email: str) -> list[User]:
         raise NotImplementedError()
 
     @abstractmethod
     async def remove(self, email: str) -> None:
         raise NotImplementedError()
-
-    @abstractmethod
-    async def list(self) -> list[User]:
-        raise NotImplementedError
 
 
 class Uow(ABC):
