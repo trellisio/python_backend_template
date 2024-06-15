@@ -44,12 +44,21 @@ class AddRequestLogger(BaseHTTPMiddleware):
                 "url": str(request.url),
                 "error": str(e),
             }
-            logger.opt(ansi=True).error(
-                f"<red>[{request.method}] {request.url} -- \n{json.dumps(payload, indent=4)}</red>"
-            )
+            self._log_by_color('error', f"[{request.method}] {request.url} -- \n{json.dumps(payload, indent=4)}", 500)
             raise e
 
-        logger.opt(ansi=True).info(
-            f"[{request.method}] {request.url} {response.status_code} - {response.headers["X-Process-Time"]}"
-        )
+        self._log_by_color("info", f"[{request.method}] {request.url} {response.status_code} - {response.headers["X-Process-Time"]}", response.status_code)
         return response
+
+    def _log_by_color(
+        self, log_type: Literal["info", "error"], message: str, status_code: int
+    ):
+        color = self._get_color(status_code)
+        getattr(logger.opt(ansi=True), log_type)(f"<{color}>{message}</{color}>")
+
+    def _get_color(self, status_code: int):
+        if status_code < 300:
+            return "green"
+        if status_code < 500:
+            return "yellow"
+        return "red"
