@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, TypedDict
 
 Payload = dict[str, Any] | str
+
+
+class Events(TypedDict):
+    channel: str
+    payload: Payload
 
 
 class Publisher(ABC):

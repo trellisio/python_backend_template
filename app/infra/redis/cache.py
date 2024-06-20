@@ -3,7 +3,7 @@ from typing import Mapping
 from kink import inject
 from redis.asyncio import Redis
 
-from app.services.interfaces.cache import Cache, CacheValue
+from app.services.adapters.cache import Cache, CacheValue
 
 from .connection import RedisConnection
 

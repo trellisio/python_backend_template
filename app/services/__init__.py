@@ -1,4 +1,3 @@
-from . import interfaces
+from . import adapters
 
-
-__all__ = ["interfaces"]
+__all__ = ["adapters"]

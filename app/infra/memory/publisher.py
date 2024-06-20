@@ -2,7 +2,7 @@ from typing import Mapping
 
 from kink import inject
 
-from app.services.interfaces.publisher import Payload, Publisher
+from app.services.adapters.publisher import Payload, Publisher
 
 
 @inject(alias=Publisher)

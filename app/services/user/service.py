@@ -2,8 +2,8 @@ from kink import inject
 
 from app.domain.models import User
 
+from ..adapters import Uow
 from ..errors import ResourceExistsException
-from ..interfaces import Uow
 from .dtos import CreateUser
 
 

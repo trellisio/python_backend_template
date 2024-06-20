@@ -4,12 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.future import select
 
 from app.domain import models
-from app.services.interfaces.uow import Uow, UserRepository, Views
+from app.services.adapters.uow import Uow, UserRepository
 
 from .connection import SqlConnection
 
 
-@inject(alias=UserRepository)
 class SqlAlchemyUserRepository(UserRepository):
     session: AsyncSession
 
@@ -30,30 +29,22 @@ class SqlAlchemyUserRepository(UserRepository):
             delete(models.User).where(models.User.email == email)
         )
 
-@inject(alias=Views)
-class SqlAlchemyViews(Views):
-    async def list_users() -> list[models.User]:
-        raise NotImplementedError()
 
 @inject(alias=Uow)
 class SqlAlchemyUow(Uow):
     # repositories
     user_repository: SqlAlchemyUserRepository
-    
-    # views
-    views: SqlAlchemyViews
 
     # session
     session_factory: async_sessionmaker[AsyncSession]
     session: AsyncSession
 
-    def __init__(self, connection: SqlConnection, views: SqlAlchemyViews):
-        engine = connection.engine
+    def __init__(self, connection: SqlConnection):
+        engine = connection.update_engine
         self.session_factory = async_sessionmaker(
             engine,
             expire_on_commit=False,
         )
-        self.views = views
 
     async def __aenter__(self):
         async with self.session_factory() as session:
