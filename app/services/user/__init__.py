@@ -1,4 +1,4 @@
 from . import dtos
-from .service import UserService
+from .service import UserCrudService, UserService
 
-__all__ = ["UserService", "dtos"]
+__all__ = ["UserCrudService", "UserService", "dtos"]

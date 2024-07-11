@@ -9,6 +9,7 @@ user = Table(
     "user",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("version", Integer, nullable=False, default=0),
     Column("email", String, nullable=False, unique=True, index=True),
 )
 

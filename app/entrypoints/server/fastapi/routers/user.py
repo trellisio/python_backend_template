@@ -1,14 +1,14 @@
 from classy_fastapi import Routable, post
 from kink import di, inject
 
-from app.services.user import UserService, dtos
+from app.services.user import UserCrudService, dtos
 
 
 @inject()
 class UserRoutes(Routable):
-    service: UserService
+    service: UserCrudService
 
-    def __init__(self, service: UserService):
+    def __init__(self, service: UserCrudService):
         super().__init__()
         self.service = service
 

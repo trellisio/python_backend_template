@@ -38,11 +38,15 @@ class SqlConnection(Connection):
 
     async def connect(self):
         config = SqlConnectionConfig()
-        
-        self.update_engine = create_async_engine(config.DB_URL, future=True, echo=config.DB_ECHO)
+
+        self.update_engine = create_async_engine(
+            config.DB_URL, future=True, echo=config.DB_ECHO
+        )
         self.update_engine.execution_options(isolation_level=config.DB_ISOLATION_LEVEL)
-        
-        self.read_engine = create_async_engine(config.DB_URL, future=True, echo=config.DB_ECHO)
+
+        self.read_engine = create_async_engine(
+            config.DB_URL, future=True, echo=config.DB_ECHO
+        )
         self.read_engine.execution_options(isolation_level="READ COMMITTED")
 
         await self.apply_migrations()
