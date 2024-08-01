@@ -25,7 +25,7 @@ class SqlAlchemyUserRepository(UserRepository):
         return res.scalars().all()
 
     async def remove(self, email: str) -> list[models.User]:
-        await self.session.execute(
+        return await self.session.execute(
             delete(models.User).where(models.User.email == email)
         )
 

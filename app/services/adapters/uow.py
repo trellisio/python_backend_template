@@ -57,7 +57,7 @@ class Repository[T: Aggregate](ABC):
         @wraps(method)
         async def fn(*args, **kwargs):
             model = await method(*args, **kwargs)
-            if type(model) == list:
+            if isinstance(model, list):
                 for m in model:
                     self._seen.add(m)
             else:
@@ -72,7 +72,7 @@ class Repository[T: Aggregate](ABC):
         @wraps(method)
         async def fn(*args, **kwargs):
             model = await method(*args, **kwargs)
-            if type(model) == list:
+            if isinstance(model, list):
                 for m in model:
                     self._seen.remove(m)
             else:
@@ -101,7 +101,7 @@ class Repository[T: Aggregate](ABC):
                     else:
                         model = args[i]
 
-                    if type(model) == list:
+                    if isinstance(model, list):
                         self.seen.update(model)
                     else:
                         self.seen.add(model)
@@ -196,6 +196,11 @@ class Uow(ABC):
             domain_events = self._collect_events()
             for event in domain_events:
                 await self._publisher.publish(event.channel, event.data)
+
+            seen_aggs = self._collect_seen_aggregates()
+            for agg in seen_aggs:
+                agg.version += 1
+
             await commit(*args, **kwargs)
 
         setattr(self, "commit", fn)

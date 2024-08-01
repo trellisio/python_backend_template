@@ -43,11 +43,11 @@ class SqlConnection(Connection):
             config.DB_URL, future=True, echo=config.DB_ECHO
         )
         self.update_engine.execution_options(isolation_level=config.DB_ISOLATION_LEVEL)
-
-        self.read_engine = create_async_engine(
-            config.DB_URL, future=True, echo=config.DB_ECHO
-        )
-        self.read_engine.execution_options(isolation_level="READ COMMITTED")
+        self.read_engine = self.update_engine
+        # self.read_engine = create_async_engine(
+        #     config.DB_URL, future=True, echo=config.DB_ECHO
+        # )
+        # self.read_engine.execution_options(isolation_level="READ COMMITTED")
 
         await self.apply_migrations()
         add_model_mappings()

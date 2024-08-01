@@ -39,7 +39,7 @@ integration: down up
 
 # Testing
 unit:
-	pytest -vv tests/unit/ --capture=tee-sys --asyncio-mode=auto
+	pytest -vv --capture=tee-sys --asyncio-mode=auto tests/unit/
 
 int:
 	./wait-for.sh http://service_name_fastapi:8000/healthz pytest -vv tests/integration --capture=tee-sys --asyncio-mode=auto

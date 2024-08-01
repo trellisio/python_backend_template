@@ -8,9 +8,8 @@ Create Date: 2024-06-03 22:50:46.671694
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "64b9b712a7b7"
@@ -25,6 +24,7 @@ def upgrade() -> None:
         "user",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("email", sa.String(), nullable=False),
+        sa.Column("version", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_user_email"), "user", ["email"], unique=True)
