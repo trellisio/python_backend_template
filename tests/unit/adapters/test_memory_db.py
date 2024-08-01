@@ -39,7 +39,8 @@ class TestInMemoryDb:
 
     async def test_can_remove_model(self):
         async with self.uow:
-            await self.uow.user_repository.remove("email@gmail.com")
+            removed_users = await self.uow.user_repository.remove("email@gmail.com")
+            assert removed_users[0].email == "email@gmail.com"
             await self.uow.commit()
 
         users = await self.query.list_users()

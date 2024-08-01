@@ -1,5 +1,6 @@
+from typing import cast
+
 from kink import inject
-from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.future import select
 
@@ -15,19 +16,23 @@ class SqlAlchemyUserRepository(UserRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add(self, User: models.User):
-        self.session.add(User)
+    async def add(self, user: models.User):
+        self.session.add(user)
 
     async def find(self, email: str) -> list[models.User]:
-        res = await self.session.execute(
-            select(models.User).where(models.User.email == email)
-        )
-        return res.scalars().all()
+        stmt = select(models.User).where(models.User.email == email)  # type: ignore
+        res = await self.session.execute(stmt)
+        return cast(list[models.User], res.scalars().all())
 
     async def remove(self, email: str) -> list[models.User]:
-        return await self.session.execute(
-            delete(models.User).where(models.User.email == email)
-        )
+        stmt = select(models.User).where(models.User.email == email)  # type: ignore
+        res = await self.session.execute(stmt)
+        users = cast(list[models.User], res.scalars().all())
+
+        for user in users:
+            await self.session.delete(user)
+
+        return users
 
 
 @inject(alias=Uow)

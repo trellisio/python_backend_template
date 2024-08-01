@@ -5,6 +5,7 @@ from alembic.config import Config
 from kink import inject
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from sqlalchemy import Connection as SqlAlchemyConnection
 from sqlalchemy.engine.interfaces import IsolationLevel
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
@@ -66,7 +67,7 @@ class SqlConnection(Connection):
         await self.read_engine.dispose()
 
     async def apply_migrations(self):
-        def run_upgrade(connection: AsyncEngine, cfg: Config):
+        def run_upgrade(connection: SqlAlchemyConnection, cfg: Config):
             cfg.attributes["connection"] = connection
             command.upgrade(cfg, "head")
 
