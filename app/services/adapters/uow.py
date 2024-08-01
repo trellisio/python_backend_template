@@ -1,11 +1,131 @@
 from abc import ABC, abstractmethod
+from functools import wraps
+from inspect import signature
+from typing import Literal
 
+from app.domain.aggregate import Aggregate
+from app.domain.event import Event
 from app.domain.models import User
 
+from .publisher import Publisher
 
-class UserRepository(ABC):
+
+class Repository[T: Aggregate](ABC):
+    _seen: set[T]
+
+    def __init__(self):
+        self._seen = set()
+        self._decorate_methods()
+
+    @property
+    def seen(self) -> set[T]:
+        return self._seen
+
+    # Internals
+    def _decorate_methods(self):
+        self._decorate_method("find")
+        self._decorate_method("remove")
+        self._decorate_method("add")
+
+    def _get_methods(
+        self, startswith: Literal["find"] | Literal["remove"] | Literal["add"]
+    ) -> list[str]:
+        return [
+            func
+            for func in dir(self)
+            if callable(getattr(self, func)) and func.startswith(startswith)
+        ]
+
+    def _decorate_method(
+        self, startswith: Literal["find"] | Literal["remove"] | Literal["add"]
+    ):
+        methods = self._get_methods(startswith)
+
+        if startswith == "find":
+            decoration = self._find_decorator
+        elif startswith == "remove":
+            decoration = self._remove_decorator
+        else:
+            decoration = self._add_decorator
+
+        for method in methods:
+            decorated_method = decoration(getattr(self, method))
+            setattr(self, method, decorated_method)
+
+    def _find_decorator(self, method: callable) -> callable:
+        # takes find_* method and adds returned objects to seen set
+        @wraps(method)
+        async def fn(*args, **kwargs):
+            model = await method(*args, **kwargs)
+            if type(model) == list:
+                for m in model:
+                    self._seen.add(m)
+            else:
+                self._seen.add(model)
+
+            return model
+
+        return fn
+
+    def _remove_decorator(self, method: callable) -> callable:
+        # takes find_* method and adds returned objects to seen set
+        @wraps(method)
+        async def fn(*args, **kwargs):
+            model = await method(*args, **kwargs)
+            if type(model) == list:
+                for m in model:
+                    self._seen.remove(m)
+            else:
+                self._seen.remove(model)
+
+            return model
+
+        return fn
+
+    def _add_decorator(self, method: callable) -> callable:
+        @wraps(method)
+        async def fn(*args, **kwargs):
+            # inspect passed method and find param name mapping to T
+            sig = signature(method)
+            parameters = sig.parameters
+            keys = parameters.keys()
+
+            for i in range(len(keys)):
+                key = keys[i]
+                param_metadata = parameters[key]
+                annotation = param_metadata.annotation
+                if annotation == T or annotation == list[T]:
+                    # Found parameter with annotation to model
+                    if key in kwargs:
+                        model = kwargs[key]
+                    else:
+                        model = args[i]
+
+                    if type(model) == list:
+                        self.seen.update(model)
+                    else:
+                        self.seen.add(model)
+
+            return await method(*args, **kwargs)
+
+        return fn
+
     @abstractmethod
-    async def add(self, user: User) -> None:
+    async def add(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def find(self) -> list[T]:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def remove(self) -> list[T]:
+        raise NotImplementedError()
+
+
+class UserRepository(Repository[User], ABC):
+    @abstractmethod
+    async def add(self, user: User):
         raise NotImplementedError()
 
     @abstractmethod
@@ -13,12 +133,22 @@ class UserRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def remove(self, email: str) -> None:
+    async def remove(self, email: str) -> list[User]:
         raise NotImplementedError()
 
 
 class Uow(ABC):
     user_repository: UserRepository
+
+    _publisher: Publisher
+
+    def __init__(self, publisher: Publisher):
+        self._publisher = publisher
+        self._decorate_defined_commit_method()
+
+    @property
+    def repositories(self) -> list[Repository]:
+        return [self.user_repository]
 
     @abstractmethod
     async def __aenter__(self):
@@ -39,3 +169,33 @@ class Uow(ABC):
     @abstractmethod
     async def close(self):
         raise NotImplementedError()
+
+    # Internals
+
+    def _collect_seen_aggregates(self) -> list[Aggregate]:
+        aggs: list[Aggregate] = []
+        for repo in self.repositories:
+            aggs.extend(repo.seen)
+
+        return aggs
+
+    def _collect_events(self) -> list[Event]:
+        events: list[Event] = []
+        seen_aggs = self._collect_seen_aggregates()
+        for agg in seen_aggs:
+            events.extend(agg.events)
+
+        return events
+
+    def _decorate_defined_commit_method(self):
+        # decorate commit method to auto emit raised domain events
+        commit = getattr(self, "commit")
+
+        @wraps(commit)
+        async def fn(*args, **kwargs):
+            domain_events = self._collect_events()
+            for event in domain_events:
+                await self._publisher.publish(event.channel, event.data)
+            await commit(*args, **kwargs)
+
+        setattr(self, "commit", fn)

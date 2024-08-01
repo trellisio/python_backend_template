@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, TypedDict
+from typing import TypedDict
 
-Payload = dict[str, Any] | str
+from app.domain.event import Payload
 
 
 class Events(TypedDict):

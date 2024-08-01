@@ -2,7 +2,7 @@ from kink import inject
 
 from app.domain.models import User
 
-from ..adapters import Uow
+from ..adapters import Publisher, Uow
 from ..errors import NoResourceException, ResourceExistsException
 from .dtos import CreateUser
 
@@ -28,10 +28,12 @@ class UserCrudService:
 @inject()
 class UserService:
     uow: Uow
+    publisher: Publisher
 
-    def __init__(self, uow: Uow):
+    def __init__(self, uow: Uow, publisher: Publisher):
         self.uow = uow
-    
+        self.publisher = publisher
+
     async def do_something_domainy(self, email: str):
         async with self.uow:
             users = await self.uow.user_repository.find(email)
@@ -40,5 +42,5 @@ class UserService:
 
             for user in users:
                 await user.some_domain_method()
-            
+
             await self.uow.commit()

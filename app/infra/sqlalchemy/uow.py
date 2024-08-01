@@ -15,7 +15,7 @@ class SqlAlchemyUserRepository(UserRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add(self, User: models.User) -> None:
+    async def add(self, User: models.User):
         self.session.add(User)
 
     async def find(self, email: str) -> list[models.User]:
@@ -24,7 +24,7 @@ class SqlAlchemyUserRepository(UserRepository):
         )
         return res.scalars().all()
 
-    async def remove(self, email: str) -> None:
+    async def remove(self, email: str) -> list[models.User]:
         await self.session.execute(
             delete(models.User).where(models.User.email == email)
         )
