@@ -1,6 +1,7 @@
 import pytest
 
 from app.domain import models
+from app.infra.memory.publisher import InMemoryEventPublisher
 from app.infra.sqlalchemy.query import SqlAlchemyQuery
 from app.infra.sqlalchemy.uow import SqlAlchemyUow, SqlConnection
 
@@ -14,7 +15,7 @@ class TestInMemoryDb:
         # create database tables
         connection = SqlConnection()
         await connection.connect()
-        self.uow = SqlAlchemyUow(connection)
+        self.uow = SqlAlchemyUow(connection, InMemoryEventPublisher())
         self.query = SqlAlchemyQuery(connection)
         await self._seed_model()
 
@@ -82,4 +83,5 @@ class TestInMemoryDb:
         async with self.uow:
             user = models.User(email=email)
             await self.uow.user_repository.add(user)
+            await self.uow.commit()
             await self.uow.commit()

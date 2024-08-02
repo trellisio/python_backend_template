@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
+from collections.abc import Awaitable, Callable
 from functools import wraps
 from inspect import signature
-from typing import Literal
+from typing import Any, Literal
 
 from app.domain.aggregate import Aggregate
 from app.domain.event import Event
@@ -20,6 +21,10 @@ class Repository[T: Aggregate](ABC):
     @property
     def seen(self) -> set[T]:
         return self._seen
+
+    @seen.setter
+    def seen(self, _: Any):
+        raise ValueError("Seen cannot be set")
 
     # Internals
     def _decorate_methods(self):
@@ -41,18 +46,18 @@ class Repository[T: Aggregate](ABC):
     ):
         methods = self._get_methods(startswith)
 
-        if startswith == "find":
-            decoration = self._find_decorator
-        elif startswith == "remove":
-            decoration = self._remove_decorator
-        else:
+        if startswith == "add":
             decoration = self._add_decorator
+        else:
+            decoration = self._add_to_seen_decorator
 
         for method in methods:
             decorated_method = decoration(getattr(self, method))
             setattr(self, method, decorated_method)
 
-    def _find_decorator(self, method: callable) -> callable:
+    def _add_to_seen_decorator(
+        self, method: Callable[[Any, Any], Awaitable[list[T]]]
+    ) -> Callable[[Any, Any], Awaitable[list[T]]]:
         # takes find_* method and adds returned objects to seen set
         @wraps(method)
         async def fn(*args, **kwargs):
@@ -67,34 +72,22 @@ class Repository[T: Aggregate](ABC):
 
         return fn
 
-    def _remove_decorator(self, method: callable) -> callable:
-        # takes find_* method and adds returned objects to seen set
-        @wraps(method)
-        async def fn(*args, **kwargs):
-            model = await method(*args, **kwargs)
-            if isinstance(model, list):
-                for m in model:
-                    self._seen.remove(m)
-            else:
-                self._seen.remove(model)
-
-            return model
-
-        return fn
-
-    def _add_decorator(self, method: callable) -> callable:
+    def _add_decorator(
+        self, method: Callable[[Any, Any], Awaitable[list[T]]]
+    ) -> Callable[[Any, Any], Awaitable[list[T]]]:
         @wraps(method)
         async def fn(*args, **kwargs):
             # inspect passed method and find param name mapping to T
             sig = signature(method)
             parameters = sig.parameters
-            keys = parameters.keys()
+            keys = list(parameters.keys())
 
             for i in range(len(keys)):
                 key = keys[i]
                 param_metadata = parameters[key]
                 annotation = param_metadata.annotation
-                if annotation == T or annotation == list[T]:
+
+                if issubclass(annotation, Aggregate):
                     # Found parameter with annotation to model
                     if key in kwargs:
                         model = kwargs[key]
