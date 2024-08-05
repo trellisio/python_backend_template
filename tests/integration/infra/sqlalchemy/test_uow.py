@@ -1,6 +1,7 @@
 import pytest
 
 from app.domain import models
+from app.infra.memory.publisher import InMemoryEventPublisher
 from app.infra.sqlalchemy.uow import SqlAlchemyUow, SqlConnection
 
 
@@ -11,7 +12,7 @@ class TestSqlDb:
     async def set_up(self):
         connection = SqlConnection()
         await connection.connect()
-        self.uow = SqlAlchemyUow(connection)
+        self.uow = SqlAlchemyUow(connection, InMemoryEventPublisher())
         await self._seed_model()
 
         yield
@@ -23,15 +24,12 @@ class TestSqlDb:
 
     async def test_can_select_model(self):
         async with self.uow:
-            user = await self.uow.user_repository.find(email="email@gmail.com")
-            assert user is not None
-            assert user.email == "email@gmail.com"
-
-    async def test_can_list_models(self):
-        async with self.uow:
-            users = await self.uow.user_repository.list()
+            users = await self.uow.user_repository.find(email="email@gmail.com")
+            assert users is not None
+            assert users != []
             assert len(users) == 1
-            assert users[0].email == "email@gmail.com"
+            user = users[0]
+            assert user.email == "email@gmail.com"
 
     async def test_can_remove_model(self):
         async with self.uow:
@@ -39,7 +37,7 @@ class TestSqlDb:
             await self.uow.commit()
 
         async with self.uow:
-            users = await self.uow.user_repository.list()
+            users = await self.uow.user_repository.find(email="email@gmail.com")
             assert users == []
 
     async def test_can_rollback(self):
@@ -49,8 +47,8 @@ class TestSqlDb:
             await self.uow.rollback()
 
         async with self.uow:
-            user = await self.uow.user_repository.find(email="another_email@gmail.com")
-            assert user is None
+            users = await self.uow.user_repository.find(email="another_email@gmail.com")
+            assert users == []
 
     async def test_rollback_occurs_when_commit_not_called(self):
         async with self.uow:
@@ -58,8 +56,8 @@ class TestSqlDb:
             await self.uow.user_repository.add(user)
 
         async with self.uow:
-            user = await self.uow.user_repository.find(email="another_email@gmail.com")
-            assert user is None
+            users = await self.uow.user_repository.find(email="another_email@gmail.com")
+            assert users == []
 
     async def test_rollback_occurs_when_error_is_raised(self):
         try:
@@ -71,8 +69,8 @@ class TestSqlDb:
             pass
 
         async with self.uow:
-            user = await self.uow.user_repository.find(email="another_email@gmail.com")
-            assert user is None
+            users = await self.uow.user_repository.find(email="another_email@gmail.com")
+            assert users == []
 
     async def _seed_model(self, email: str = "email@gmail.com"):
         async with self.uow:
