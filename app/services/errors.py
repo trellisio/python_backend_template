@@ -16,7 +16,7 @@ class ServiceException(Exception):
         self.detail = detail
 
     def serialize(self):
-        payload = {"msg": self.msg}
+        payload: dict[str, str | list[Detail]] = {"msg": self.msg}
         if self.detail:
             payload["detail"] = self.detail
         return payload

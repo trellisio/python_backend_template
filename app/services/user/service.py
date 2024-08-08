@@ -41,6 +41,6 @@ class UserService:
                 raise NoResourceException()
 
             for user in users:
-                await user.some_domain_method()
+                user.some_domain_method()
 
             await self.uow.commit()
