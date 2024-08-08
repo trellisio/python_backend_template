@@ -141,6 +141,127 @@ class TestUow:
             user = users[0]
             assert user.version == 1
 
+    async def test_calling_commit_twice_wont_increment_version_twice(self):
+        async with self.uow:
+            user = models.User(email="another_email@gmail.com")
+            await self.uow.user_repository.add(user)
+            await self.uow.commit()
+
+            try:
+                await self.uow.commit()
+            except Exception:
+                pass
+
+        async with self.uow:
+            users = await self.uow.user_repository.find(email="another_email@gmail.com")
+            assert len(users) == 1
+            user = users[0]
+            assert user.version == 1
+
+    async def test_calling_commit_twice_wont_raise_domain_event_twice(self):
+        async with self.uow:
+            user = models.User(email="another_email@gmail.com")
+            await self.uow.user_repository.add(user)
+            user.some_domain_method()
+            await self.uow.commit()
+
+            try:
+                await self.uow.commit()
+            except Exception:
+                pass
+
+        async with self.uow:
+            users = await self.uow.user_repository.find(email="another_email@gmail.com")
+            assert len(users) == 1
+            assert self.publisher.published_messages == [
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "another_email@gmail.com"},
+                }
+            ]
+
+    async def test_seen_aggregates_restart_on_each_session(self):
+        async with self.uow:
+            users = await self.uow.user_repository.find_by_email(
+                email="email@gmail.com"
+            )
+            assert users == list(self.uow.user_repository.seen)
+
+        async with self.uow:
+            assert list(self.uow.user_repository.seen) == []
+
+    async def test_objects_that_are_edited_after_commit_are_committed_on_second_commit(
+        self,
+    ):
+        async with self.uow:
+            users = await self.uow.user_repository.find_by_email(
+                email="email@gmail.com"
+            )
+            user = users[0]
+            user.some_domain_method()
+            await self.uow.commit()
+
+            assert user.version == 2
+            assert self.publisher.published_messages == [
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "email@gmail.com"},
+                }
+            ]
+
+            new_user = models.User(email="another_email@gmail.com")
+            await self.uow.user_repository.add(new_user)
+            new_user.some_domain_method()
+            await self.uow.commit()
+
+            assert new_user.version == 1
+            assert user.version == 2
+            assert self.publisher.published_messages == [
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "email@gmail.com"},
+                },
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "another_email@gmail.com"},
+                },
+            ]
+
+            await self.uow.commit()
+
+            assert new_user.version == 1
+            assert user.version == 2
+            assert self.publisher.published_messages == [
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "email@gmail.com"},
+                },
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "another_email@gmail.com"},
+                },
+            ]
+
+            old_users = await self.uow.user_repository.find_by_email(
+                email="email@gmail.com"
+            )
+            old_user = old_users[0]
+            await self.uow.commit()
+
+            assert (
+                old_user.version == 3
+            )  # NOTE that will increase because was fetched through repo
+            assert self.publisher.published_messages == [
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "email@gmail.com"},
+                },
+                {
+                    "channel": "DomainThingHappened",
+                    "payload": {"email": "another_email@gmail.com"},
+                },
+            ]
+
     async def _seed_model(self, email: str = "email@gmail.com"):
         async with self.uow:
             user = models.User(email=email)

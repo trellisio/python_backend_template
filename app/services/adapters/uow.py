@@ -165,10 +165,12 @@ class Uow(ABC):
 
     # Internals
 
-    def _collect_seen_aggregates(self) -> list[Aggregate]:
+    def _collect_seen_aggregates(self, clear: bool = False) -> list[Aggregate]:
         aggs: list[Aggregate] = []
         for repo in self.repositories:
             aggs.extend(repo.seen)
+            if clear:
+                repo._seen = set()
 
         return aggs
 
@@ -177,6 +179,7 @@ class Uow(ABC):
         seen_aggs = self._collect_seen_aggregates()
         for agg in seen_aggs:
             events.extend(agg.events)
+            agg._events = []
 
         return events
 
@@ -190,7 +193,7 @@ class Uow(ABC):
             for event in domain_events:
                 await self._publisher.publish(event.channel, event.data)
 
-            seen_aggs = self._collect_seen_aggregates()
+            seen_aggs = self._collect_seen_aggregates(clear=True)
             for agg in seen_aggs:
                 agg.version += 1
 
