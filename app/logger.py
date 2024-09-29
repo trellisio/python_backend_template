@@ -1,4 +1,4 @@
-from sys import stderr, stdout
+from sys import stderr
 from typing import Literal
 
 from loguru import logger

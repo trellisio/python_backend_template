@@ -28,14 +28,14 @@ commit-ready: lint format
 
 # Docker
 up:
-	docker-compose -f ./docker-compose.yml build
-	docker-compose -f ./docker-compose.yml up -d --force-recreate
+	docker compose -f ./docker-compose.yml build
+	docker compose -f ./docker-compose.yml up -d --force-recreate
 
 down:
-	docker-compose -f ./docker-compose.yml down --remove-orphans
+	docker compose -f ./docker-compose.yml down --remove-orphans
 
 integration: down up
-	docker-compose -f ./docker-compose.yml up --exit-code-from integration_tests integration_tests
+	docker compose -f ./docker-compose.yml up --exit-code-from integration_tests integration_tests
 
 # Testing
 unit:

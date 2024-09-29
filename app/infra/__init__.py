@@ -1,3 +1,4 @@
+# ruff: noqa: F403
 from kink import di, inject
 
 from app.config import config
@@ -7,7 +8,7 @@ from .connection import Connection
 # Initialize Infra
 match config.ENVIRONMENT:
     case "local":
-        from .memory.cache import *
+        from .memory.cache import *  # noqa: F403
         from .memory.publisher import *
         from .sqlalchemy.query import *
         from .sqlalchemy.uow import *
@@ -36,5 +37,10 @@ class InfraInitializer:
 
 infra_initializer = di[InfraInitializer]
 
-init_connections = lambda: infra_initializer.init_connections()
-close_connections = lambda: infra_initializer.close_connections()
+
+async def init_connections():
+    await infra_initializer.init_connections()
+
+
+async def close_connections():
+    await infra_initializer.close_connections()

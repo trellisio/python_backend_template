@@ -7,5 +7,5 @@ class Connection(ABC):
         pass
 
     @abstractmethod
-    async def close(cleanup: bool = False):
+    async def close(self, cleanup: bool = False):
         pass
