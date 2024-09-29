@@ -1,3 +1,3 @@
-from . import adapters
+from . import ports
 
-__all__ = ["adapters"]
+__all__ = ["ports"]

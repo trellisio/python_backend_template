@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.future import select
 
 from app.domain import models
-from app.services.adapters import Publisher
-from app.services.adapters.uow import Uow, UserRepository
+from app.services.ports import Publisher
+from app.services.ports.uow import Uow, UserRepository
 
 from .connection import SqlConnection
 

@@ -2,8 +2,8 @@ from kink import inject
 
 from app.domain.models import User
 
-from ..adapters import Publisher, Uow
 from ..errors import NoResourceException, ResourceExistsException
+from ..ports import Publisher, Uow
 from .dtos import CreateUser
 
 

@@ -3,7 +3,7 @@ import json
 from kink import inject
 from nats.aio.client import Client
 
-from app.services.adapters.publisher import Payload, Publisher
+from app.services.ports.publisher import Payload, Publisher
 
 from .connection import NatsConnection
 

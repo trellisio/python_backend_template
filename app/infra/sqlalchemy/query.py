@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.services.adapters import Query
+from app.services.ports import Query
 
 from .connection import SqlConnection
 
