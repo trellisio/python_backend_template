@@ -1,0 +1,4 @@
+config for envs (for lib)
+debug logging
+fix casing, typing in files
+UOW custom exception?

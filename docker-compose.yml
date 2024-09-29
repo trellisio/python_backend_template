@@ -1,0 +1,54 @@
+services:
+  # Service
+  service_name_fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: fastapi_dev
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app
+    environment:
+      - ENVIRONMENT=test
+      - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
+    restart: 'always'
+    depends_on:
+      - nats
+      - postgres
+      - redis
+  integration_tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    volumes:
+      - ./:/app
+    environment:
+      - LOG_LEVEL=ERROR
+      - ENVIRONMENT=test
+      - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
+      - SERVER_URL=http://service_name_fastapi:8000
+    depends_on:
+      - service_name_fastapi
+  # Infrastructure
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: service_name
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+    ports:
+      - 5432:5432
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+  nats:
+    image: nats:alpine
+    restart: always
+    command:
+      - '--jetstream'
+    ports:
+      - 4222:4222
