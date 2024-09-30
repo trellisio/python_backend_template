@@ -8,6 +8,7 @@ from app.domain.aggregate import Aggregate
 from app.domain.event import Event
 from app.domain.models import User
 
+from ..reflection import Reflector
 from .publisher import Publisher
 
 
@@ -35,11 +36,7 @@ class Repository[T: Aggregate](ABC):
     def _get_methods(
         self, startswith: Literal["find"] | Literal["remove"] | Literal["add"]
     ) -> list[str]:
-        return [
-            func
-            for func in dir(self)
-            if callable(getattr(self, func)) and func.startswith(startswith)
-        ]
+        return Reflector._get_methods(self, startswith)
 
     def _decorate_method(
         self, startswith: Literal["find"] | Literal["remove"] | Literal["add"]

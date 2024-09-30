@@ -1,6 +1,7 @@
 import pytest
 
 from app.domain import models
+from app.infra.memory.cache import InMemoryCache
 from app.infra.memory.publisher import InMemoryEventPublisher
 from app.infra.sqlalchemy.query import SqlAlchemyQuery
 from app.infra.sqlalchemy.uow import SqlAlchemyUow, SqlConnection
@@ -16,7 +17,7 @@ class TestInMemoryDb:
         connection = SqlConnection()
         await connection.connect()
         self.uow = SqlAlchemyUow(connection, InMemoryEventPublisher())
-        self.query = SqlAlchemyQuery(connection)
+        self.query = SqlAlchemyQuery(connection, InMemoryCache())
         await self._seed_model()
 
         yield

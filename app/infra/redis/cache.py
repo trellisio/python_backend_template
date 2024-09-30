@@ -19,7 +19,8 @@ class RedisCache(Cache):
         return await self.rc.get(key)
 
     async def multi_get(self, keys: list[str]) -> list[str | None]:
-        return await self.rc.mget(keys).decode("utf-8")
+        result = await self.rc.mget(keys)
+        return result.decode("utf-8")
 
     async def set(self, key: str, value: CacheValue) -> bool:
         ok = await self.rc.set(key, value)
@@ -34,10 +35,11 @@ class RedisCache(Cache):
         raise Exception(f"Unable to mset for {values}")
 
     async def delete(self, key: str) -> bool:
-        return await self.multi_delete([key])
+        result = await self.multi_delete([key])
+        return result[0]
 
     async def multi_delete(self, keys: list[str]) -> list[bool]:
         ok = await self.rc.delete(*keys)
         if ok:
-            return ok
+            return [True] * len(keys)
         raise Exception(f"Unable to delete for {keys}")

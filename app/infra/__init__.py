@@ -42,5 +42,5 @@ async def init_connections():
     await infra_initializer.init_connections()
 
 
-async def close_connections():
-    await infra_initializer.close_connections()
+async def close_connections(cleanup: bool = False):
+    await infra_initializer.close_connections(cleanup)
