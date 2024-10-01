@@ -3,7 +3,7 @@ from typing import Mapping
 from kink import inject
 from redis.asyncio import Redis
 
-from app.services.ports.cache import Cache, CacheValue
+from app.services.ports.cache import Cache
 
 from .connection import RedisConnection
 
@@ -21,12 +21,12 @@ class RedisCache(Cache):
     async def multi_get(self, keys: list[str]) -> list[str | None]:
         return await self.rc.mget(keys)
 
-    async def set(self, key: str, value: CacheValue, ttl: int | None = None) -> bool:
+    async def set(self, key: str, value: str, ttl: int | None = None) -> bool:
         value = str(value)
         ok = await self.rc.set(key, value, ex=ttl)
         return bool(ok)
 
-    async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
+    async def multi_set(self, values: Mapping[str, str]) -> bool:
         vals = {}
         for key, value in values.items():
             vals[key] = str(value)

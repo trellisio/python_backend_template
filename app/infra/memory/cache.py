@@ -3,7 +3,7 @@ from typing import Any, Mapping
 
 from kink import inject
 
-from app.services.ports.cache import Cache, CacheValue
+from app.services.ports.cache import Cache
 
 
 @inject(alias=Cache)
@@ -22,14 +22,14 @@ class InMemoryCache(Cache):
     async def multi_get(self, keys: list[str]) -> list[str | None]:
         return [self.store.get(key, None) for key in keys]
 
-    async def set(self, key: str, value: CacheValue, ttl: int | None = None) -> bool:
+    async def set(self, key: str, value: str, ttl: int | None = None) -> bool:
         self.store[key] = value
         if ttl:
             asyncio.create_task(self._delete_with_delay(key, ttl))
 
         return True
 
-    async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
+    async def multi_set(self, values: Mapping[str, str]) -> bool:
         for key, value in values.items():
             self.store[key] = value
         return True

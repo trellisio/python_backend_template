@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 from functools import wraps
 from inspect import signature
@@ -23,13 +24,13 @@ class Query(ABC):
         self._cache = cache
         self._cache_key_prefix = "__port:Query"
         self._ttl = ttl or config.CACHE_TTL
-
         self._decorate_to_be_cached_methods()
 
     @abstractmethod
     async def list_users(self) -> list[str]:
         raise NotImplementedError()
 
+    # Internals
     def _decorate_to_be_cached_methods(self):
         for name in self._cache_list:
             method = getattr(self, name)
@@ -44,12 +45,10 @@ class Query(ABC):
             async def fn(*args, **kwargs):
                 result = await self._cache.get(cache_key)
                 if result:
-                    return result
+                    return json.loads(result)
 
                 result = await method(*args, **kwargs)
-                await self._cache.set(cache_key, result, self._ttl)
+                await self._cache.set(cache_key, json.dumps(result), self._ttl)
                 return result
-
-            setattr(self, name, fn)
 
             setattr(self, name, fn)

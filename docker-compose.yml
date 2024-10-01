@@ -12,6 +12,7 @@ services:
     environment:
       - ENVIRONMENT=test
       - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
+      - CACHE_TTL=5
     restart: 'always'
     depends_on:
       - nats

@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Mapping
 
-type CacheValue = str | int | float | bool | list | dict
-
 
 class Cache(ABC):
     @abstractmethod
@@ -14,11 +12,11 @@ class Cache(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def set(self, key: str, value: CacheValue, ttl: int | None = None) -> bool:
+    async def set(self, key: str, value: str, ttl: int | None = None) -> bool:
         raise NotImplementedError()
 
     @abstractmethod
-    async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
+    async def multi_set(self, values: Mapping[str, str]) -> bool:
         raise NotImplementedError()
 
     @abstractmethod
