@@ -32,20 +32,34 @@ services:
       - SERVER_URL=http://service_name_fastapi:8000
     depends_on:
       - service_name_fastapi
+
   # Infrastructure
+  # DB
   postgres:
     image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_DB: service_name
       POSTGRES_PASSWORD: password
       POSTGRES_USER: user
-    ports:
-      - 5432:5432
+
+  # Cache
   redis:
     image: redis:latest
     restart: always
     ports:
       - 6379:6379
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    ports:
+      - 6380:8081
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+
+  # Broker
   nats:
     image: nats:alpine
     restart: always
