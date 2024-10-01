@@ -58,3 +58,56 @@ class TestRedisCache:
         assert res is None
         res = await self.cache.get("company")
         assert res is None
+
+    async def test_can_set_and_get_list_objs(self):
+        payload = ["a", "b", "c"]
+
+        res = await self.cache.set("example:list", payload)
+        assert res is True
+
+        res = await self.cache.get("example:list")
+        assert res == str(payload)
+
+    async def test_can_mset_and_mget_list_objs(self):
+        mapping = {"a:list": ["a"], "b:list": ["b"], "c:list": ["c"]}
+
+        res = await self.cache.multi_set(mapping)
+        assert res is True
+
+        res = await self.cache.multi_get(["a:list", "b:list", "c:list"])
+        assert res == [
+            str(mapping["a:list"]),
+            str(mapping["b:list"]),
+            str(mapping["c:list"]),
+        ]
+
+    async def test_can_set_and_get_dict_objs(self):
+        payload = {"a": 0, "b": 1, "c": "2"}
+
+        res = await self.cache.set("example:dict", payload)
+        assert res is True
+
+        res = await self.cache.get("example:dict")
+        assert res == str(payload)
+
+    async def test_can_mset_and_mget_dict_objs(self):
+        mapping = {"a:list": ["a"], "b:list": ["b"], "c:list": ["c"]}
+
+        res = await self.cache.multi_set(mapping)
+        assert res is True
+
+        res = await self.cache.multi_get(["a:list", "b:list", "c:list"])
+        assert res == [
+            str(mapping["a:list"]),
+            str(mapping["b:list"]),
+            str(mapping["c:list"]),
+        ]
+
+    async def test_can_set_and_get_complex_objs(self):
+        payload = {"a": [False, 1, "2"], "b": {"0": 1, "1": False, "2": 2}, "c": "2"}
+
+        res = await self.cache.set("payload:complex:obj", payload)
+        assert res is True
+
+        res = await self.cache.get("payload:complex:obj")
+        assert res == str(payload)

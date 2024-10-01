@@ -14,7 +14,10 @@ class InMemoryCache(Cache):
         self.store = {}
 
     async def get(self, key: str) -> str | None:
-        return self.store.get(key, None)
+        result = self.store.get(key, None)
+        if result:
+            return str(result)
+        return None
 
     async def multi_get(self, keys: list[str]) -> list[str | None]:
         return [self.store.get(key, None) for key in keys]

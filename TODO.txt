@@ -1,7 +1,6 @@
 config for envs (for lib)
 debug logging
-fix casing, typing in files
+fix casing, typing, style in files
 UOW custom exception?
 
-Bruno
-dev hot reload
+pagination on views

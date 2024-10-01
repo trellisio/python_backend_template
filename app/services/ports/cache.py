@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Mapping
 
-type CacheValue = str | int | float | bool
+type CacheValue = str | int | float | bool | list | dict
 
 
 class Cache(ABC):

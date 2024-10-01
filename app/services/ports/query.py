@@ -21,7 +21,7 @@ class Query(ABC):
 
     def __init__(self, cache: Cache, ttl: int | None = None):
         self._cache = cache
-        self._cache_key_prefix = "__port_Query"
+        self._cache_key_prefix = "__port:Query"
         self._ttl = ttl or config.CACHE_TTL
 
         self._decorate_to_be_cached_methods()
@@ -38,7 +38,7 @@ class Query(ABC):
             parameters = sig.parameters
             keys = list(parameters.keys())
 
-            cache_key = f"{self._cache_key_prefix}_{"_".join(keys)}"
+            cache_key = f"{self._cache_key_prefix}:{":".join(keys)}"
 
             @wraps(method)
             async def fn(*args, **kwargs):

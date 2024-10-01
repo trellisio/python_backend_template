@@ -19,15 +19,19 @@ class RedisCache(Cache):
         return await self.rc.get(key)
 
     async def multi_get(self, keys: list[str]) -> list[str | None]:
-        result = await self.rc.mget(keys)
-        return result.decode("utf-8")
+        return await self.rc.mget(keys)
 
     async def set(self, key: str, value: CacheValue, ttl: int | None = None) -> bool:
+        value = str(value)
         ok = await self.rc.set(key, value, ex=ttl)
         return bool(ok)
 
     async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
-        ok = await self.rc.mset(values)
+        vals = {}
+        for key, value in values.items():
+            vals[key] = str(value)
+
+        ok = await self.rc.mset(vals)
         return bool(ok)
 
     async def delete(self, key: str) -> bool:
