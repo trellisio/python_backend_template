@@ -14,7 +14,7 @@ class Cache(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def set(self, key: str, value: CacheValue) -> bool:
+    async def set(self, key: str, value: CacheValue, ttl: int | None = None) -> bool:
         raise NotImplementedError()
 
     @abstractmethod

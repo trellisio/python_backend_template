@@ -22,24 +22,17 @@ class RedisCache(Cache):
         result = await self.rc.mget(keys)
         return result.decode("utf-8")
 
-    async def set(self, key: str, value: CacheValue) -> bool:
-        ok = await self.rc.set(key, value)
-        if ok:
-            return ok
-        raise Exception(f"Unable to set val {value} for key {key}")
+    async def set(self, key: str, value: CacheValue, ttl: int | None = None) -> bool:
+        ok = await self.rc.set(key, value, ex=ttl)
+        return bool(ok)
 
-    async def multi_set(self, values: Mapping[str, CacheValue]) -> list[bool]:
+    async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
         ok = await self.rc.mset(values)
-        if ok:
-            return ok
-        raise Exception(f"Unable to mset for {values}")
+        return bool(ok)
 
     async def delete(self, key: str) -> bool:
-        result = await self.multi_delete([key])
-        return result[0]
+        return await self.multi_delete([key])
 
-    async def multi_delete(self, keys: list[str]) -> list[bool]:
+    async def multi_delete(self, keys: list[str]) -> bool:
         ok = await self.rc.delete(*keys)
-        if ok:
-            return [True] * len(keys)
-        raise Exception(f"Unable to delete for {keys}")
+        return bool(ok)

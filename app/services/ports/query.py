@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from functools import wraps
 from inspect import signature
 
+from app.config import config
+
 from .cache import Cache
 
 
@@ -13,12 +15,15 @@ class Query(ABC):
 
     _cache: Cache
     _cache_key_prefix = "__port-Query"
+    _ttl: int | None
 
     _cache_list = ["list_users"]  # List of methods to be cached
 
-    def __init__(self, cache: Cache):
+    def __init__(self, cache: Cache, ttl: int | None = None):
         self._cache = cache
         self._cache_key_prefix = "__port_Query"
+        self._ttl = ttl or config.CACHE_TTL
+
         self._decorate_to_be_cached_methods()
 
     @abstractmethod
@@ -42,7 +47,9 @@ class Query(ABC):
                     return result
 
                 result = await method(*args, **kwargs)
-                await self._cache.set(cache_key, result)
+                await self._cache.set(cache_key, result, self._ttl)
                 return result
+
+            setattr(self, name, fn)
 
             setattr(self, name, fn)

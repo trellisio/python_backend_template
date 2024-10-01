@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Mapping
 
 from kink import inject
@@ -18,8 +19,11 @@ class InMemoryCache(Cache):
     async def multi_get(self, keys: list[str]) -> list[str | None]:
         return [self.store.get(key, None) for key in keys]
 
-    async def set(self, key: str, value: CacheValue) -> bool:
+    async def set(self, key: str, value: CacheValue, ttl: int | None = None) -> bool:
         self.store[key] = value
+        if ttl:
+            asyncio.create_task(self._delete_with_delay(key, ttl))
+
         return True
 
     async def multi_set(self, values: Mapping[str, CacheValue]) -> bool:
@@ -36,3 +40,7 @@ class InMemoryCache(Cache):
             if result is False:
                 return False
         return True
+
+    async def _delete_with_delay(self, key: str, ttl: int):
+        await asyncio.sleep(ttl)
+        await self.delete(key)
