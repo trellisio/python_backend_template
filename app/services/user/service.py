@@ -53,5 +53,9 @@ class UserViewService:
     def __init__(self, query: Query):
         self.query = query
 
-    async def list_users(self):
-        return await self.query.list_users()
+    async def list_users(
+        self,
+        skip: int = 0,
+        limit: int = 50,
+    ):
+        return await self.query.list_users(skip, limit)

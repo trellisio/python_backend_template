@@ -27,7 +27,11 @@ class Query(ABC):
         self._decorate_to_be_cached_methods()
 
     @abstractmethod
-    async def list_users(self) -> list[str]:
+    async def list_users(
+        self,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[str]:
         raise NotImplementedError()
 
     # Internals

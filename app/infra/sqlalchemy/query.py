@@ -21,7 +21,17 @@ class SqlAlchemyQuery(Query):
             expire_on_commit=False,
         )
 
-    async def list_users(self) -> list[str]:
+    async def list_users(
+        self,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[str]:
         async with self.session_factory() as session:
-            res = await session.execute(text('SELECT "email" FROM "user"'))
+            res = await session.execute(
+                text(f"""
+                    SELECT "email" FROM "user"
+                    LIMIT {limit}
+                    OFFSET {skip}
+                """)
+            )
             return [r[0] for r in res]
