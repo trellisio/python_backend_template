@@ -13,7 +13,7 @@ services:
       - ENVIRONMENT=test
       - DB_URL=postgresql+asyncpg://user:password@postgres:5432/service_name
       - CACHE_TTL=5
-    restart: 'always'
+    restart: always
     depends_on:
       - nats
       - postgres
@@ -34,6 +34,22 @@ services:
       - service_name_fastapi
 
   # Infrastructure
+  # Observability
+  prometheus:
+    image: prom/prometheus:lates
+    restart: always
+    volumes:
+      - ./tools/prometheus:/etc/prometheus/
+    ports:
+      - 9090:9090
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+
   # DB
   postgres:
     image: postgres:latest
