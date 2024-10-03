@@ -1,14 +1,29 @@
-from fastapi import APIRouter, Response
+from classy_fastapi import Routable, get
+from fastapi import Response
+from kink import di, inject
 from starlette.status import HTTP_204_NO_CONTENT
 
-router = APIRouter()
+from app.services.ports import ObservabilityMetrics
 
 
-@router.get("/healthz")
-async def healthz():
-    return Response(status_code=HTTP_204_NO_CONTENT)
+@inject()
+class MonitoringRoutes(Routable):
+    metrics: ObservabilityMetrics
+
+    def __init__(self, metrics: ObservabilityMetrics):
+        super().__init__()
+        self.metrics = metrics
+
+    @get("/healthz")
+    async def healthz(self):
+        return Response(status_code=HTTP_204_NO_CONTENT)
+
+    @get("/metrics")
+    async def metrics_collector(self):
+        metrics = self.metrics.gather_current_metrics()
+        return Response(
+            content=metrics, media_type="text/plain; version=0.0.4; charset=utf-8"
+        )
 
 
-@router.get("/metrics")
-async def metrics():
-    return Response(status_code=HTTP_204_NO_CONTENT)
+monitoring_routes = di[MonitoringRoutes]

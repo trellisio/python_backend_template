@@ -3,6 +3,4 @@ debug logging
 fix casing, typing, style in files
 UOW custom exception?
 
-pagination on views
-monitoring stack
 authentication

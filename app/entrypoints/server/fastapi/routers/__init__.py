@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-from .monitoring import router as monitoring_router
+from .monitoring import monitoring_routes
 from .user import user_routes
 
 router = APIRouter()
 v1_router = APIRouter(prefix="/v1")
 
 # monitoring
-router.include_router(monitoring_router)
+router.include_router(monitoring_routes.router)
 
 # v1
 v1_router.include_router(user_routes.router, prefix="/users")
