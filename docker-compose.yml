@@ -59,6 +59,11 @@ services:
       - ./.configs/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - prometheus
+  otel:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - 4317:4317
+      - 55679:55679
 
   # DB
   postgres:

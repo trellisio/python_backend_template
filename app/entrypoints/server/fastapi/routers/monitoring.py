@@ -21,6 +21,7 @@ class MonitoringRoutes(Routable):
     @get("/metrics")
     async def metrics_collector(self):
         metrics = self.metrics.gather_current_metrics()
+        self.metrics.reset_metrics()  # reset temporary metrics
         return Response(
             content=metrics, media_type="text/plain; version=0.0.4; charset=utf-8"
         )
