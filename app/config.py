@@ -13,6 +13,15 @@ class BasesConfig(BaseSettings):
     CACHE_TTL: int | None = Field(
         description="TTL for key expiration in cache", default=None
     )
+    # Keycloak
+    KEYCLOAK_SERVER_URL: str = Field(
+        description="URL for keycloak server", default="http://keycloak:8080/auth/"
+    )
+    KEYCLOAK_REALM_NAME: str = Field(description="", default="trellis")
+    KEYCLOAK_CLIENT_ID: str = Field(description="Keycloak client for auth", default="")
+    KEYCLOAK_CLIENT_SECRET_KEY: str = Field(
+        description="Keycloak secret for auth", default=""
+    )
 
 
 config = BasesConfig()
