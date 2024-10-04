@@ -36,17 +36,27 @@ services:
   # Infrastructure
   # Observability
   prometheus:
-    image: prom/prometheus:lates
+    image: prom/prometheus:latest
     restart: always
-    volumes:
-      - ./tools/prometheus:/etc/prometheus/
     ports:
       - 9090:9090
+    volumes:
+      - ./.configs/prometheus:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+  alertmanager:
+    image: prom/alertmanager:latest
+    volumes:
+      - ./.configs/alertmanager:/etc/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
   grafana:
     image: grafana/grafana:latest
     restart: always
     ports:
       - 3000:3000
+    volumes:
+      - ./.configs/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - prometheus
 
