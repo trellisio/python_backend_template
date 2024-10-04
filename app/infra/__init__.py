@@ -8,12 +8,14 @@ from .connection import Connection
 # Initialize Infra
 match config.ENVIRONMENT:
     case "local":
+        from .memory.auth import *
         from .memory.cache import *  # noqa: F403
         from .memory.metrics import *
         from .memory.publisher import *
         from .sqlalchemy.query import *
         from .sqlalchemy.uow import *
     case _:
+        from .keycloak.auth import *
         from .nats.publisher import *
         from .prometheus.metrics import *
         from .redis.cache import *
