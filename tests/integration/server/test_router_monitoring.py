@@ -12,4 +12,4 @@ class TestMonitoringRouter:
 
     def test_metrics(self):
         resp = requests.get(f"{self.service_url}/metrics")
-        assert resp.status_code == 204
+        assert resp.status_code == 200

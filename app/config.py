@@ -15,7 +15,7 @@ class BasesConfig(BaseSettings):
     )
     # Keycloak
     KEYCLOAK_SERVER_URL: str = Field(
-        description="URL for keycloak server", default="http://keycloak:8080/auth/"
+        description="URL for keycloak server", default="http://keycloak:8080/"
     )
     KEYCLOAK_REALM_NAME: str = Field(description="", default="trellis")
     KEYCLOAK_CLIENT_ID: str = Field(description="Keycloak client for auth", default="")

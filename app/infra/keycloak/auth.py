@@ -54,9 +54,9 @@ class KeycloakAuth(Auth):
     def _convert_to_jwt(self, payload: dict) -> Jwt:
         email = payload.get("email", None)
         realm_access = payload.get("realm_access", {})
-        roles = realm_access.get("roles")
+        roles = realm_access.get("roles", [])
 
-        if not email or not roles:
+        if not email:
             raise ValueError("Authentication failed. Email or roles was not in token")
 
         return {

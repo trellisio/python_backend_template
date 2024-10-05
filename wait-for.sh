@@ -5,9 +5,9 @@ set -e
 host="$1"
 shift
   
-until curl -s $host
+until curl -o /dev/null -s $host
 do
-  >&2 echo "Service is unavailable - sleeping"
+  >&2 echo "$host is unavailable - sleeping"
   sleep 5
 done
   
