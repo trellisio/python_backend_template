@@ -23,6 +23,7 @@ class SqlAlchemyQuery(Query):
 
     async def list_users(
         self,
+        *,
         skip: int = 0,
         limit: int = 50,
     ) -> list[str]:

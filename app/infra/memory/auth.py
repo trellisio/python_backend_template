@@ -1,6 +1,9 @@
+from kink import inject
+
 from app.services.ports.auth import Auth, Jwt, Token
 
 
+@inject(alias=Auth)
 class InMemoryAuth(Auth):
     _validation_outcome: bool
     _role_outcome: bool

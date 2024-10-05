@@ -2,6 +2,7 @@ import json
 from abc import ABC, abstractmethod
 from functools import wraps
 from inspect import signature
+from typing import Literal
 
 from app.config import config
 
@@ -15,7 +16,7 @@ class Query(ABC):
     """
 
     _cache: Cache
-    _cache_key_prefix = "__port-Query"
+    _cache_key_prefix: Literal["__port:Query"]
     _ttl: int | None
 
     _cache_list = ["list_users"]  # List of methods to be cached
@@ -29,6 +30,7 @@ class Query(ABC):
     @abstractmethod
     async def list_users(
         self,
+        *,
         skip: int = 0,
         limit: int = 50,
     ) -> list[str]:
@@ -43,10 +45,16 @@ class Query(ABC):
             parameters = sig.parameters
             keys = list(parameters.keys())
 
-            cache_key = f"{self._cache_key_prefix}:{":".join(keys)}"
-
             @wraps(method)
             async def fn(*args, **kwargs):
+                if len(args) > 1:
+                    raise ValueError(
+                        "use kwargs for query methods so we can cache on parameter values"
+                    )
+                cache_key_prefix = f"{self._cache_key_prefix}:{name}"
+                param_values = [f"{key}:{kwargs.get(key, "<default>")}" for key in keys]
+                cache_key = f"{cache_key_prefix}:{":".join(param_values)}"
+
                 result = await self._cache.get(cache_key)
                 if result:
                     return json.loads(result)

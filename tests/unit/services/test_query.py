@@ -32,13 +32,15 @@ class TestQuery:
         await connection.close(cleanup=True)
 
     async def test_marked_method_results_are_cached(self):
-        res = await self.cache.get(f"{self.query._cache_key_prefix}:")
+        res = await self.cache.get(
+            f"{self.query._cache_key_prefix}:list_users:skip:<default>:limit:<default>"
+        )
         assert res is None
 
         await self.query.list_users()
         res = await self.cache.get(
-            f"{self.query._cache_key_prefix}:"
-        )  # note list_users has no params
+            f"{self.query._cache_key_prefix}:list_users:skip:<default>:limit:<default>"
+        )
 
         assert res is not None
 
@@ -53,8 +55,7 @@ class TestQuery:
 
         res = await self.query.list_users()  # returning cached (stale) data still
         assert res is not None
-        print("AAAAAAA", res)
-        # assert len(json.loads(res)) == 3
+        assert len(res) == 3
 
     async def test_marked_methods_caches_expire_and_will_repopulate(self):
         self.query._ttl = 1  # specify a short ttl so cache will refresh

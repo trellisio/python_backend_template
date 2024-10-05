@@ -58,4 +58,4 @@ class UserViewService:
         skip: int = 0,
         limit: int = 50,
     ):
-        return await self.query.list_users(skip, limit)
+        return await self.query.list_users(skip=skip, limit=limit)

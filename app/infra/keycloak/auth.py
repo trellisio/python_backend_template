@@ -1,9 +1,11 @@
 from keycloak import KeycloakOpenID
+from kink import inject
 
 from app.config import config
 from app.services.ports.auth import Auth, Jwt, Token
 
 
+@inject(alias=Auth)
 class KeycloakAuth(Auth):
     _client: KeycloakOpenID
 
