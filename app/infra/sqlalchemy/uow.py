@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Literal, cast
 
 from kink import inject
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -37,35 +37,53 @@ class SqlAlchemyUserRepository(UserRepository):
         return users
 
 
-@inject(alias=Uow)
+@inject(alias=Uow, use_factory=True)
 class SqlAlchemyUow(Uow):
     # repositories
     user_repository: SqlAlchemyUserRepository
 
-    # session
-    session_factory: async_sessionmaker[AsyncSession]
-    session: AsyncSession
+    # Internals
+    _isolation_level: Literal["REPEATABLE READ"] | Literal["READ COMMITTED"]
+    _session: AsyncSession
+    _rr_session_factory: async_sessionmaker[AsyncSession]
+    _rc_session_factory: async_sessionmaker[AsyncSession]
 
     def __init__(self, connection: SqlConnection, publisher: Publisher):
         super().__init__(publisher)
-        engine = connection.update_engine
-        self.session_factory = async_sessionmaker(
-            engine,
+        rr_engine = connection.repeatable_read_engine
+        def_engine = connection.default_engine
+
+        self._rr_session_factory = async_sessionmaker(
+            rr_engine,
+            expire_on_commit=False,
+        )
+        self._default_session_factory = async_sessionmaker(
+            def_engine,
             expire_on_commit=False,
         )
 
     async def __aenter__(self):
-        async with self.session_factory() as session:
+        session_factory = self._get_session_factory("DEFAULT")
+        async with session_factory() as session:
             async with session.begin():
-                self.session = session
+                self._session = session
                 self.user_repository = SqlAlchemyUserRepository(session)
 
     async def commit(self):
-        await self.session.commit()
+        await self._session.commit()
 
     async def rollback(self):
         # if nothing to rollback, nothing will happen
-        await self.session.rollback()
+        await self._session.rollback()
 
     async def close(self):
-        await self.session.close()
+        await self._session.close()
+
+    # Internals
+    def _get_session_factory(
+        self, isolation_level: Literal["DEFAULT"] | Literal["REPEATABLE READ"]
+    ):
+        if isolation_level == "REPEATABLE READ":
+            return self._rr_session_factory
+        else:
+            return self._default_session_factory

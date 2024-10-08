@@ -17,7 +17,7 @@ class UserService:
         self.publisher = publisher
 
     async def do_something_domainy(self, email: str):
-        async with self.uow:
+        async with self.uow.begin("REPEATABLE READ"):
             users = await self.uow.user_repository.find(email)
             if not users:
                 raise NoResourceException()
@@ -36,7 +36,7 @@ class UserCrudService:
         self.uow = uow
 
     async def create_user(self, create_user: CreateUser):
-        async with self.uow:
+        async with self.uow.begin():
             users = await self.uow.user_repository.find(create_user.email)
             if users:
                 raise ResourceExistsException()

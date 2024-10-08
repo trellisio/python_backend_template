@@ -34,9 +34,9 @@ class SqlAlchemyUowImpl(SqlAlchemyUow):
     user_repository: SqlAlchemyUserRepositoryImpl
 
     async def __aenter__(self):
-        async with self.session_factory() as session:
+        async with self._default_session_factory() as session:
             async with session.begin():
-                self.session = session
+                self._session = session
                 self.user_repository = SqlAlchemyUserRepositoryImpl(session)
 
 

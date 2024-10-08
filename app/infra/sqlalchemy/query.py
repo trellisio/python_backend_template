@@ -15,9 +15,8 @@ class SqlAlchemyQuery(Query):
     def __init__(self, connection: SqlConnection, cache: Cache):
         super().__init__(cache)
 
-        engine = connection.read_engine
         self.session_factory = async_sessionmaker(
-            engine,
+            connection.default_engine,
             expire_on_commit=False,
         )
 

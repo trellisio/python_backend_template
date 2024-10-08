@@ -6,7 +6,6 @@ from kink import inject
 from pydantic import Field
 from pydantic_settings import BaseSettings
 from sqlalchemy import Connection as SqlAlchemyConnection
-from sqlalchemy.engine.interfaces import IsolationLevel
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from app.logger import logger
@@ -24,9 +23,6 @@ class SqlConnectionConfig(BaseSettings):
             "sqlite+aiosqlite:///:memory:",
         ],
     )
-    DB_ISOLATION_LEVEL: IsolationLevel = Field(
-        description="DB transaction isolation level", default="REPEATABLE READ"
-    )
     DB_ECHO: bool = Field(
         description="Boolean for DB to echo operations", default=False
     )
@@ -34,21 +30,18 @@ class SqlConnectionConfig(BaseSettings):
 
 @inject(alias=Connection)
 class SqlConnection(Connection):
-    update_engine: AsyncEngine
-    read_engine: AsyncEngine
+    repeatable_read_engine: AsyncEngine
+    default_engine: AsyncEngine
 
     async def connect(self):
         config = SqlConnectionConfig()
 
-        self.update_engine = create_async_engine(
+        self.default_engine = create_async_engine(
             config.DB_URL, future=True, echo=config.DB_ECHO
         )
-        self.update_engine.execution_options(isolation_level=config.DB_ISOLATION_LEVEL)
-        self.read_engine = self.update_engine
-        # self.read_engine = create_async_engine(
-        #     config.DB_URL, future=True, echo=config.DB_ECHO
-        # )
-        # self.read_engine.execution_options(isolation_level="READ COMMITTED")
+        self.repeatable_read_engine = self.default_engine.execution_options(
+            isolation_level="REPEATABLE READ"
+        )
 
         await self.apply_migrations()
         add_model_mappings()
@@ -57,21 +50,21 @@ class SqlConnection(Connection):
 
     async def close(self, cleanup: bool = False):
         if cleanup:
-            async with self.update_engine.begin() as conn:
+            async with self.default_engine.begin() as conn:
                 remove_model_mappings()
                 for table in metadata.sorted_tables:
                     await conn.execute(table.delete())
                     await conn.commit()
 
-        await self.update_engine.dispose()
-        await self.read_engine.dispose()
+        await self.default_engine.dispose()
+        await self.repeatable_read_engine.dispose()
 
     async def apply_migrations(self):
         def run_upgrade(connection: SqlAlchemyConnection, cfg: Config):
             cfg.attributes["connection"] = connection
             command.upgrade(cfg, "head")
 
-        async with self.update_engine.begin() as conn:
+        async with self.default_engine.begin() as conn:
             await conn.run_sync(
                 run_upgrade,
                 Config(path.join("app", "infra", "sqlalchemy", "alembic.ini")),

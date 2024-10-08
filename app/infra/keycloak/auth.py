@@ -1,8 +1,20 @@
 from keycloak import KeycloakOpenID
 from kink import inject
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
-from app.config import config
 from app.services.ports.auth import Auth, Jwt, Token
+
+
+class KeycloakConfig(BaseSettings):
+    KEYCLOAK_SERVER_URL: str = Field(
+        description="URL for keycloak server", default="http://keycloak:8080/"
+    )
+    KEYCLOAK_REALM_NAME: str = Field(description="", default="trellis")
+    KEYCLOAK_CLIENT_ID: str = Field(description="Keycloak client for auth", default="")
+    KEYCLOAK_CLIENT_SECRET_KEY: str = Field(
+        description="Keycloak secret for auth", default=""
+    )
 
 
 @inject(alias=Auth)
@@ -10,6 +22,8 @@ class KeycloakAuth(Auth):
     _client: KeycloakOpenID
 
     def __init__(self):
+        config = KeycloakConfig()
+
         self._client = KeycloakOpenID(
             server_url=config.KEYCLOAK_SERVER_URL,
             realm_name=config.KEYCLOAK_REALM_NAME,

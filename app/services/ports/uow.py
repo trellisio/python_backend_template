@@ -128,13 +128,17 @@ class UserRepository(Repository[User], ABC):
 
 
 class Uow(ABC):
+    # repositories
     user_repository: UserRepository
 
+    # Internals
     _publisher: Publisher
+    _isolation_level: Literal["REPEATABLE READ"] | Literal["READ COMMITTED"]
 
     def __init__(self, publisher: Publisher):
         self._publisher = publisher
         self._decorate_defined_commit_method()
+        self._isolation_level = "READ COMMITTED"
 
     @property
     def repositories(self) -> list[Repository]:
@@ -143,10 +147,6 @@ class Uow(ABC):
     @abstractmethod
     async def __aenter__(self):
         raise NotImplementedError()
-
-    async def __aexit__(self, exc_type, exc, tb):
-        await self.rollback()
-        await self.close()
 
     @abstractmethod
     async def commit(self):
@@ -159,6 +159,18 @@ class Uow(ABC):
     @abstractmethod
     async def close(self):
         raise NotImplementedError()
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.rollback()
+        await self.close()
+
+    def begin(
+        self,
+        isolation_level: Literal["REPEATABLE READ"]
+        | Literal["READ COMMITTED"] = "READ COMMITTED",
+    ):
+        self._isolation_level = isolation_level
+        return self
 
     # Internals
 
